@@ -410,7 +410,15 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
                 } else if (ninjaWebView.canGoBack()){
                     sp.edit().putBoolean("backPressed", true).apply();
                     ninjaWebView.goBack();
-                } else removeAlbum(currentAlbumController);
+                } else {
+                    String currentUrl = ninjaWebView != null ? ninjaWebView.getUrl() : "";
+                    String homeUrl = sp.getString("favoriteURL", "file:///android_asset/home.html");
+                    if (currentUrl != null && !currentUrl.startsWith("file:///android_asset/home.html") && !currentUrl.equals(homeUrl)) {
+                        ninjaWebView.loadUrl(homeUrl);
+                    } else {
+                        removeAlbum(currentAlbumController);
+                    }
+                }
                 return true;
         }
         return false;
@@ -431,10 +439,12 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
     public synchronized void removeAlbum(final AlbumController controller) {
 
         if (BrowserContainer.size() <= 1) {
-            if (!sp.getBoolean("sp_reopenLastTab", false)) {
-                doubleTapsQuit();
+            String currentUrl = ninjaWebView != null ? ninjaWebView.getUrl() : "";
+            String homeUrl = sp.getString("favoriteURL", "file:///android_asset/home.html");
+            if (currentUrl != null && !currentUrl.startsWith("file:///android_asset/home.html") && !currentUrl.equals(homeUrl)) {
+                ninjaWebView.loadUrl(homeUrl);
             } else {
-                ninjaWebView.loadUrl(Objects.requireNonNull(sp.getString("favoriteURL", "file:///android_asset/home.html")));
+                doubleTapsQuit();
             }
         } else {
             closeTabConfirmation(() -> {
