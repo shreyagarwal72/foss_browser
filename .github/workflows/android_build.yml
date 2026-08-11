@@ -42,15 +42,29 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
         run: ./gradlew assembleRelease --stacktrace
 
-      - name: Sign Release APK (if secrets configured)
-        if: (startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch') && secrets.SIGNING_KEY != ''
-        uses: rpx05/android-release-signer@v1.3
-        with:
-          releaseDirectory: app/build/outputs/apk/release
-          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-          alias: ${{ secrets.ALIAS }}
-          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
+      - name: Sign Release APK
+        if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          ALIAS: ${{ secrets.ALIAS }}
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [ -n "$SIGNING_KEY" ]; then
+            echo "$SIGNING_KEY" | base64 -d > release.keystore
+            for apk in app/build/outputs/apk/release/*.apk; do
+              if [ -f "$apk" ]; then
+                jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
+                  -keystore release.keystore \
+                  -storepass "$KEY_STORE_PASSWORD" \
+                  -keypass "$KEY_PASSWORD" \
+                  "$apk" "$ALIAS"
+              fi
+            done
+            rm -f release.keystore
+          else
+            echo "SIGNING_KEY secret is not configured. Skipping APK signing."
+          fi
 
       - name: Upload Release APK Artifact
         if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
