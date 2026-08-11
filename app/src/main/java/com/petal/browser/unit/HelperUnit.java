@@ -413,12 +413,16 @@ public class HelperUnit {
     }
 
     public static void setupDialog(Context context, Dialog dialog) {
-        TypedValue typedValue = new TypedValue();
-        context.getTheme().resolveAttribute(R.attr.colorError, typedValue, true);
-        int color = typedValue.data;
-        ImageView imageView = dialog.findViewById(android.R.id.icon);
-        if (imageView != null) imageView.setColorFilter(color, PorterDuff.Mode.SRC_IN);
-        Objects.requireNonNull(dialog.getWindow()).setGravity(Gravity.BOTTOM);
+        try {
+            TypedValue typedValue = new TypedValue();
+            context.getTheme().resolveAttribute(R.attr.colorError, typedValue, true);
+            int color = typedValue.data;
+            ImageView imageView = dialog.findViewById(android.R.id.icon);
+            if (imageView != null) imageView.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+            if (dialog != null && dialog.getWindow() != null) {
+                dialog.getWindow().setGravity(Gravity.BOTTOM);
+            }
+        } catch (Exception ignored) {}
     }
 
     /**

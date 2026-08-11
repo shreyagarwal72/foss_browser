@@ -262,7 +262,7 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
             boolean isKeyboardVisible = insets.isVisible(WindowInsetsCompat.Type.ime());
             int keyboardHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom;
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setBackgroundColor(ContextCompat.getColor(context, R.color.design_default_color_on_secondary));
+            v.setBackgroundColor(ContextCompat.getColor(context, R.color.md_theme_background));
             WindowInsetsControllerCompat controller = WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
             controller.setAppearanceLightStatusBars(false);
             if (isKeyboardVisible) {
