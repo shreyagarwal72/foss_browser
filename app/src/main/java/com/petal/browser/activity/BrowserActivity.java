@@ -443,7 +443,11 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
                         ninjaWebView.loadUrl(query);
                         showAlbum(currentAlbumController);
                     } else {
-                        if (inputBox != null) inputBox.requestFocus();
+                        try {
+                            initSearch();
+                            if (dialogSearch != null) dialogSearch.show();
+                            if (search_input != null) HelperUnit.showSoftKeyboard(search_input);
+                        } catch (Exception ignored) {}
                     }
                 }
 
@@ -465,18 +469,12 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
 
                 @Override
                 public void onOpenBookmarks() {
-                    try {
-                        Intent intent = new Intent(BrowserActivity.this, BookmarkActivity.class);
-                        startActivity(intent);
-                    } catch (Exception ignored) {}
+                    showOverview();
                 }
 
                 @Override
                 public void onOpenHistory() {
-                    try {
-                        Intent intent = new Intent(BrowserActivity.this, HistoryActivity.class);
-                        startActivity(intent);
-                    } catch (Exception ignored) {}
+                    showOverview();
                 }
 
                 @Override
