@@ -281,15 +281,16 @@ public class BrowserUnit {
     public static void intentURL(Context context, Uri uri) {
         if (context == null || uri == null) return;
         try {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, uri);
-            context.startActivity(browserIntent);
+            Intent fallbackIntent = new Intent(context, BrowserActivity.class);
+            fallbackIntent.setAction(Intent.ACTION_VIEW);
+            fallbackIntent.setData(uri);
+            fallbackIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(fallbackIntent);
         } catch (Exception e) {
             try {
-                Intent fallbackIntent = new Intent(context, BrowserActivity.class);
-                fallbackIntent.setAction(Intent.ACTION_VIEW);
-                fallbackIntent.setData(uri);
-                fallbackIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(fallbackIntent);
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, uri);
+                browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(browserIntent);
             } catch (Exception ignored) {}
         }
     }

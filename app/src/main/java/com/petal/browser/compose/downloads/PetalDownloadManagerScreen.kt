@@ -44,8 +44,10 @@ data class DownloadItem(
 
 object PetalDownloadBridge {
     @JvmStatic
-    fun createDownloadView(context: Context, onBackPress: () -> Unit): ComposeView {
-        return ComposeView(context).apply {
+    fun createDownloadView(activity: ComponentActivity, onBackPress: () -> Unit): ComposeView {
+        return ComposeView(activity).apply {
+            setViewTreeLifecycleOwner(activity)
+            setViewTreeSavedStateRegistryOwner(activity)
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 PetalExpressiveTheme {
