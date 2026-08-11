@@ -1,7 +1,8 @@
 /*
  * PetalHomeScreen.kt
  * ─────────────────────────────────────────────────────────────────────────
- * Material 3 Expressive home ("new tab") screen for Petal Browser.
+ * Material 3 Expressive home screen for Petal Browser with Stride UI components,
+ * IconSwitch toggles, AMOLED dark mode, and Material You dynamic color support.
  */
 
 package com.petal.browser.compose.home
@@ -18,11 +19,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Bookmarks
+import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.rounded.Downloading
 import androidx.compose.material.icons.rounded.History
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Mic
+import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.rounded.Tab
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -40,94 +46,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.petal.browser.ui.components.IconSwitch
+import com.petal.browser.ui.theme.PetalExpressiveTheme
 import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
 
-// ── 1. Color tokens ────
-
-private object PetalColorsLight {
-    val primary = Color(0xFF676013)
-    val onPrimary = Color(0xFFFFFFFF)
-    val primaryContainer = Color(0xFFEFE58B)
-    val onPrimaryContainer = Color(0xFF1F1C00)
-    val secondaryContainer = Color(0xFFEAE3BD)
-    val onSecondaryContainer = Color(0xFF1E1C05)
-    val tertiaryContainer = Color(0xFFD3EC9E)
-    val onTertiaryContainer = Color(0xFF141F00)
-    val background = Color(0xFFFEF9EB)
-    val onBackground = Color(0xFF1D1C14)
-    val surfaceContainer = Color(0xFFF3EEE0)
-    val surfaceContainerHigh = Color(0xFFEDE8DA)
-    val surfaceContainerHighest = Color(0xFFE7E2D5)
-    val outline = Color(0xFF7A7768)
-    val outlineVariant = Color(0xFFCBC7B5)
-}
-
-private object PetalColorsDark {
-    val primary = Color(0xFFC8CC78)
-    val onPrimary = Color(0xFF313300)
-    val primaryContainer = Color(0xFF3C3F00)
-    val onPrimaryContainer = Color(0xFFD1D480)
-    val secondaryContainer = Color(0xFF48473B)
-    val onSecondaryContainer = Color(0xFFE5E2D9)
-    val tertiaryContainer = Color(0xFFA5653C)
-    val onTertiaryContainer = Color(0xFFFFFFFF)
-    val background = Color(0xFF14140E)
-    val onBackground = Color(0xFFE5E2D9)
-    val surfaceContainer = Color(0xFF201F17)
-    val surfaceContainerHigh = Color(0xFF2A2A1F)
-    val surfaceContainerHighest = Color(0xFF353429)
-    val outline = Color(0xFF929181)
-    val outlineVariant = Color(0xFF48483A)
-}
-
-@Composable
-fun PetalTheme(
-    darkTheme: Boolean = androidx.compose.foundation.isSystemInDarkTheme(),
-    content: @Composable () -> Unit,
-) {
-    val colors = if (darkTheme) {
-        darkColorScheme(
-            primary = PetalColorsDark.primary,
-            onPrimary = PetalColorsDark.onPrimary,
-            primaryContainer = PetalColorsDark.primaryContainer,
-            onPrimaryContainer = PetalColorsDark.onPrimaryContainer,
-            secondaryContainer = PetalColorsDark.secondaryContainer,
-            onSecondaryContainer = PetalColorsDark.onSecondaryContainer,
-            tertiaryContainer = PetalColorsDark.tertiaryContainer,
-            onTertiaryContainer = PetalColorsDark.onTertiaryContainer,
-            background = PetalColorsDark.background,
-            onBackground = PetalColorsDark.onBackground,
-            surfaceContainer = PetalColorsDark.surfaceContainer,
-            surfaceContainerHigh = PetalColorsDark.surfaceContainerHigh,
-            surfaceContainerHighest = PetalColorsDark.surfaceContainerHighest,
-            outline = PetalColorsDark.outline,
-            outlineVariant = PetalColorsDark.outlineVariant,
-        )
-    } else {
-        lightColorScheme(
-            primary = PetalColorsLight.primary,
-            onPrimary = PetalColorsLight.onPrimary,
-            primaryContainer = PetalColorsLight.primaryContainer,
-            onPrimaryContainer = PetalColorsLight.onPrimaryContainer,
-            secondaryContainer = PetalColorsLight.secondaryContainer,
-            onSecondaryContainer = PetalColorsLight.onSecondaryContainer,
-            tertiaryContainer = PetalColorsLight.tertiaryContainer,
-            onTertiaryContainer = PetalColorsLight.onTertiaryContainer,
-            background = PetalColorsLight.background,
-            onBackground = PetalColorsLight.onBackground,
-            surfaceContainer = PetalColorsLight.surfaceContainer,
-            surfaceContainerHigh = PetalColorsLight.surfaceContainerHigh,
-            surfaceContainerHighest = PetalColorsLight.surfaceContainerHighest,
-            outline = PetalColorsLight.outline,
-            outlineVariant = PetalColorsLight.outlineVariant,
-        )
-    }
-    MaterialTheme(colorScheme = colors, content = content)
-}
-
-// ── 2. Data model ───────────────────────────────────────────────────────
+// ── 1. Data model ───────────────────────────────────────────────────────
 
 data class PetalShortcut(
     val label: String,
@@ -151,7 +76,7 @@ private val petalShapes: List<Shape> = listOf(
     RoundedCornerShape(24.dp),
 )
 
-// ── 3. Java Interop Callback Interface ──────────────────────────────────
+// ── 2. Java Interop Callback Interface ──────────────────────────────────
 
 interface PetalHomeActionHandler {
     fun onSearch(query: String)
@@ -164,7 +89,6 @@ interface PetalHomeActionHandler {
     fun onOpenSettings()
 }
 
-// Helper object for Java caller to instantiate ComposeView effortlessly
 object PetalComposeBridge {
     @JvmStatic
     fun createComposeHomeView(
@@ -174,7 +98,7 @@ object PetalComposeBridge {
         return ComposeView(context).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                PetalTheme {
+                PetalExpressiveTheme {
                     PetalHomeScreen(
                         onSearch = { handler.onSearch(it) },
                         onOpenShortcut = { handler.onOpenUrl(it.url) },
@@ -191,7 +115,7 @@ object PetalComposeBridge {
     }
 }
 
-// ── 4. Screen Composable ────────────────────────────────────────────────
+// ── 3. Screen Composable ────────────────────────────────────────────────
 
 @Composable
 fun PetalHomeScreen(
@@ -206,69 +130,228 @@ fun PetalHomeScreen(
     onOpenDownloads: () -> Unit = {},
     onOpenSettings: () -> Unit = {},
 ) {
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-        floatingActionButton = {
-            LargeFloatingActionButton(
-                onClick = onNewTab,
-                shape = RoundedCornerShape(24.dp),
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+    var isAmoledEnabled by remember { mutableStateOf(false) }
+    var isDynamicColorEnabled by remember { mutableStateOf(true) }
+    var isAdBlockEnabled by remember { mutableStateOf(true) }
+    var isHttpsOnlyEnabled by remember { mutableStateOf(true) }
+
+    PetalExpressiveTheme(
+        dynamicColor = isDynamicColorEnabled,
+        useAmoled = isAmoledEnabled
+    ) {
+        Scaffold(
+            containerColor = MaterialTheme.colorScheme.background,
+            floatingActionButton = {
+                LargeFloatingActionButton(
+                    onClick = onNewTab,
+                    shape = RoundedCornerShape(24.dp),
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                ) {
+                    Icon(Icons.Rounded.Tab, contentDescription = "New tab")
+                }
+            },
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Icon(Icons.Rounded.Tab, contentDescription = "New tab")
+                Spacer(Modifier.height(28.dp))
+
+                Text(
+                    text = greeting(greetingName),
+                    style = MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.SemiBold,
+                        letterSpacing = (-0.5).sp,
+                    ),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Text(
+                    text = "Petal",
+                    style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+
+                Spacer(Modifier.height(24.dp))
+
+                PetalSearchBar(onSearch = onSearch)
+
+                Spacer(Modifier.height(32.dp))
+
+                PetalBloom(
+                    shortcuts = shortcuts,
+                    onOpenShortcut = onOpenShortcut,
+                    onAddShortcut = onAddShortcut,
+                )
+
+                Spacer(Modifier.height(32.dp))
+
+                QuickActionRow(
+                    onOpenBookmarks = onOpenBookmarks,
+                    onOpenHistory = onOpenHistory,
+                    onOpenDownloads = onOpenDownloads,
+                    onOpenSettings = onOpenSettings,
+                )
+
+                Spacer(Modifier.height(24.dp))
+
+                // Expressive Stride Preferences Card with IconSwitches
+                ExpressiveTogglesCard(
+                    isAmoled = isAmoledEnabled,
+                    onAmoledChange = { isAmoledEnabled = it },
+                    isDynamicColor = isDynamicColorEnabled,
+                    onDynamicColorChange = { isDynamicColorEnabled = it },
+                    isAdBlock = isAdBlockEnabled,
+                    onAdBlockChange = { isAdBlockEnabled = it },
+                    isHttpsOnly = isHttpsOnlyEnabled,
+                    onHttpsOnlyChange = { isHttpsOnlyEnabled = it }
+                )
+
+                Spacer(Modifier.height(96.dp))
             }
-        },
-    ) { innerPadding ->
+        }
+    }
+}
+
+@Composable
+private fun ExpressiveTogglesCard(
+    isAmoled: Boolean,
+    onAmoledChange: (Boolean) -> Unit,
+    isDynamicColor: Boolean,
+    onDynamicColorChange: (Boolean) -> Unit,
+    isAdBlock: Boolean,
+    onAdBlockChange: (Boolean) -> Unit,
+    isHttpsOnly: Boolean,
+    onHttpsOnlyChange: (Boolean) -> Unit
+) {
+    Surface(
+        shape = RoundedCornerShape(24.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Spacer(Modifier.height(28.dp))
-
             Text(
-                text = greeting(greetingName),
-                style = MaterialTheme.typography.headlineMedium.copy(
-                    fontWeight = FontWeight.SemiBold,
-                    letterSpacing = (-0.5).sp,
-                ),
-                color = MaterialTheme.colorScheme.onBackground,
-                textAlign = TextAlign.Center,
+                text = "Browser & Theme Options",
+                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            // IconSwitch for AMOLED Black Mode
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-            )
-            Text(
-                text = "Petal",
-                style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.primary,
-                textAlign = TextAlign.Center,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "AMOLED Black Dark Mode",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = "Pure black backgrounds for OLED screens",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                IconSwitch(
+                    checked = isAmoled,
+                    icon = Icons.Rounded.DarkMode,
+                    onCheckedChange = onAmoledChange
+                )
+            }
+
+            Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+
+            // IconSwitch for Material You Dynamic Colors
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-            )
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Material You Dynamic Colors",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = "Android 12+ wallpaper colors",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                IconSwitch(
+                    checked = isDynamicColor,
+                    icon = Icons.Rounded.Palette,
+                    onCheckedChange = onDynamicColorChange
+                )
+            }
 
-            Spacer(Modifier.height(24.dp))
+            Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
 
-            PetalSearchBar(onSearch = onSearch)
+            // IconSwitch for Ad & Tracker Protection
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Ad & Tracker Shield",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = "Block unwanted web ads and tracking",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                IconSwitch(
+                    checked = isAdBlock,
+                    icon = Icons.Rounded.Shield,
+                    onCheckedChange = onAdBlockChange
+                )
+            }
 
-            Spacer(Modifier.height(36.dp))
+            Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
 
-            PetalBloom(
-                shortcuts = shortcuts,
-                onOpenShortcut = onOpenShortcut,
-                onAddShortcut = onAddShortcut,
-            )
-
-            Spacer(Modifier.height(36.dp))
-
-            QuickActionRow(
-                onOpenBookmarks = onOpenBookmarks,
-                onOpenHistory = onOpenHistory,
-                onOpenDownloads = onOpenDownloads,
-                onOpenSettings = onOpenSettings,
-            )
-
-            Spacer(Modifier.height(96.dp))
+            // IconSwitch for HTTPS Only Mode
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "HTTPS Security Enforcer",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = "Upgrade connections to secure HTTPS",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                IconSwitch(
+                    checked = isHttpsOnly,
+                    icon = Icons.Rounded.Lock,
+                    onCheckedChange = onHttpsOnlyChange
+                )
+            }
         }
     }
 }
@@ -450,16 +533,4 @@ private fun QuickAction(
             Text(label, style = MaterialTheme.typography.labelSmall)
         }
     }
-}
-
-@Preview(showBackground = true, name = "Petal — light")
-@Composable
-private fun PetalHomeScreenLightPreview() {
-    PetalTheme(darkTheme = false) { PetalHomeScreen() }
-}
-
-@Preview(showBackground = true, name = "Petal — dark")
-@Composable
-private fun PetalHomeScreenDarkPreview() {
-    PetalTheme(darkTheme = true) { PetalHomeScreen(greetingName = "Alex") }
 }

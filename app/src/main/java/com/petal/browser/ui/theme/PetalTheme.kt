@@ -53,22 +53,39 @@ private val PetalDarkColors = darkColorScheme(
     outlineVariant = Color(0xFF48483A),
 )
 
+/** Pure-black window with a near-black elevation ladder for AMOLED panels. */
+fun ColorScheme.applyAmoled(): ColorScheme = copy(
+    background = Color.Black,
+    surface = Color.Black,
+    surfaceContainerLowest = Color.Black,
+    surfaceContainerLow = Color(0xFF0B0B0B),
+    surfaceContainer = Color(0xFF101010),
+    surfaceContainerHigh = Color(0xFF181818),
+    surfaceContainerHighest = Color(0xFF222222),
+    surfaceVariant = Color(0xFF1C1C1C)
+)
+
 /**
- * Petal Material 3 Theme with Android 12+ (API 31+) Material You Dynamic Color support.
+ * Petal Material 3 Theme with Android 12+ (API 31+) Material You Dynamic Color and AMOLED Black support.
  */
 @Composable
 fun PetalExpressiveTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = true,
+    useAmoled: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
-    val colorScheme = when {
+    var colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
         darkTheme -> PetalDarkColors
         else -> PetalLightColors
+    }
+
+    if (darkTheme && useAmoled) {
+        colorScheme = colorScheme.applyAmoled()
     }
 
     val view = LocalView.current
@@ -77,7 +94,7 @@ fun PetalExpressiveTheme(
             val activity = view.context as? Activity ?: return@SideEffect
             WindowCompat.setDecorFitsSystemWindows(activity.window, false)
             activity.window.statusBarColor = android.graphics.Color.TRANSPARENT
-            activity.window.navigationBarColor = android.graphics.Color.TRANSPARENT
+activity.window.navigationBarColor = android.graphics.Color.TRANSPARENT
             val controller = WindowCompat.getInsetsController(activity.window, view)
             controller.isAppearanceLightStatusBars = !darkTheme
             controller.isAppearanceLightNavigationBars = !darkTheme
