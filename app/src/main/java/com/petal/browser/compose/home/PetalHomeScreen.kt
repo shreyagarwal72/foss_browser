@@ -3,7 +3,7 @@
  * ─────────────────────────────────────────────────────────────────────────
  * Material 3 Expressive home screen for Petal Browser with Stride UI components,
  * Stride Floating Bottom Navigation Bar, Chrome Android-style Live Tab Switcher Badge,
- * IconSwitch toggles, AMOLED dark mode, and Material You dynamic color support.
+ * IconSwitch toggles with persistent SharedPreferences, AMOLED dark mode, and Material You dynamic colors.
  */
 
 package com.petal.browser.compose.home
@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -47,6 +48,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.preference.PreferenceManager
 import com.petal.browser.ui.components.IconSwitch
 import com.petal.browser.ui.components.PetalBottomNavBar
 import com.petal.browser.ui.components.PetalNavTab
@@ -139,10 +141,14 @@ fun PetalHomeScreen(
     onOpenSettings: () -> Unit = {},
     onTabsClick: () -> Unit = {},
 ) {
-    var isAmoledEnabled by remember { mutableStateOf(false) }
-    var isDynamicColorEnabled by remember { mutableStateOf(true) }
-    var isAdBlockEnabled by remember { mutableStateOf(true) }
-    var isHttpsOnlyEnabled by remember { mutableStateOf(true) }
+    val context = LocalContext.current
+    val sp = remember { PreferenceManager.getDefaultSharedPreferences(context) }
+
+    // Persistent state loaded directly from SharedPreferences
+    var isAmoledEnabled by remember { mutableStateOf(sp.getBoolean("sp_amoled", false)) }
+    var isDynamicColorEnabled by remember { mutableStateOf(sp.getBoolean("useDynamicColor", true)) }
+    var isAdBlockEnabled by remember { mutableStateOf(sp.getBoolean("sp_ad_block", true)) }
+    var isHttpsOnlyEnabled by remember { mutableStateOf(sp.getBoolean("sp_https_only", true)) }
     var selectedNavTab by remember { mutableStateOf(PetalNavTab.HOME) }
 
     PetalExpressiveTheme(
@@ -231,16 +237,28 @@ fun PetalHomeScreen(
 
                 Spacer(Modifier.height(24.dp))
 
-                // Expressive Stride Preferences Card with IconSwitches
+                // Expressive Stride Preferences Card with IconSwitches and Persistent SharedPreferences
                 ExpressiveTogglesCard(
                     isAmoled = isAmoledEnabled,
-                    onAmoledChange = { isAmoledEnabled = it },
+                    onAmoledChange = { newValue ->
+                        isAmoledEnabled = newValue
+                        sp.edit().putBoolean("sp_amoled", newValue).apply()
+                    },
                     isDynamicColor = isDynamicColorEnabled,
-                    onDynamicColorChange = { isDynamicColorEnabled = it },
+                    onDynamicColorChange = { newValue ->
+                        isDynamicColorEnabled = newValue
+                        sp.edit().putBoolean("useDynamicColor", newValue).apply()
+                    },
                     isAdBlock = isAdBlockEnabled,
-                    onAdBlockChange = { isAdBlockEnabled = it },
+                    onAdBlockChange = { newValue ->
+                        isAdBlockEnabled = newValue
+                        sp.edit().putBoolean("sp_ad_block", newValue).apply()
+                    },
                     isHttpsOnly = isHttpsOnlyEnabled,
-                    onHttpsOnlyChange = { isHttpsOnlyEnabled = it }
+                    onHttpsOnlyChange = { newValue ->
+                        isHttpsOnlyEnabled = newValue
+                        sp.edit().putBoolean("sp_https_only", newValue).apply()
+                    }
                 )
 
                 Spacer(Modifier.height(96.dp))
