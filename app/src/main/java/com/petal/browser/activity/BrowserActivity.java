@@ -2784,16 +2784,6 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
                     .putBoolean("sp_autofill", true)
                     .apply();
             ninjaWebView.setProfileDefaultValues();
-
-            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
-            String m = getString(R.string.app_intro_a) + " " +getString(R.string.app_intro_b);
-            builder.setTitle(R.string.app_name);
-            builder.setMessage(m);
-            builder.setIcon(R.drawable.icon_web);
-            builder.setPositiveButton(R.string.app_ok, (dialog, whichButton) -> dialog.cancel());
-            AlertDialog dialog = builder.create();
-            dialog.show();
-            HelperUnit.setupDialog(context, dialog);
         }
 
         ninjaWebView.setBrowserController(this);
@@ -2815,11 +2805,18 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
             hideOverview();
             ninjaWebView.setBrowserController(this);
             ninjaWebView.activate();
-            dialogOverview.cancel();
+            if (dialogOverview != null) dialogOverview.cancel();
             showAlbum(ninjaWebView);
         }
-        View albumView = ninjaWebView.getAlbumView();
-        tab_container.addView(albumView, WRAP_CONTENT, WRAP_CONTENT);
+        try {
+            View albumView = ninjaWebView.getAlbumView();
+            if (albumView != null && tab_container != null) {
+                if (albumView.getParent() != null) {
+                    ((ViewGroup) albumView.getParent()).removeView(albumView);
+                }
+                tab_container.addView(albumView, WRAP_CONTENT, WRAP_CONTENT);
+            }
+        } catch (Exception ignored) {}
         updateOmniBox();
     }
 
