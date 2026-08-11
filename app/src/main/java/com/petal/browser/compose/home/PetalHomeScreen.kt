@@ -98,11 +98,13 @@ interface PetalHomeActionHandler {
 object PetalComposeBridge {
     @JvmStatic
     fun createComposeHomeView(
-        context: Context,
+        activity: androidx.activity.ComponentActivity,
         tabCount: Int,
         handler: PetalHomeActionHandler
     ): ComposeView {
-        return ComposeView(context).apply {
+        return ComposeView(activity).apply {
+            androidx.lifecycle.ViewTreeLifecycleOwner.set(this, activity)
+            androidx.savedstate.ViewTreeSavedStateRegistryOwner.set(this, activity)
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 PetalExpressiveTheme {

@@ -527,6 +527,7 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
 
                 com.petal.browser.compose.home.PetalBottomNavBridge.bindBottomNav(
                     bottomNavCompose,
+                    this,
                     activeTab,
                     BrowserContainer.size(),
                     new com.petal.browser.compose.home.PetalBottomNavHandler() {
