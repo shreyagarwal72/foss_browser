@@ -4,7 +4,9 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.savedstate.ViewTreeSavedStateRegistryOwner
+import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.petal.browser.ui.components.PetalBottomNavBar
 import com.petal.browser.ui.components.PetalNavTab
 import com.petal.browser.ui.theme.PetalExpressiveTheme
@@ -26,8 +28,8 @@ object PetalBottomNavBridge {
         handler: PetalBottomNavHandler
     ) {
         composeView.apply {
-            ViewTreeLifecycleOwner.set(this, activity)
-            ViewTreeSavedStateRegistryOwner.set(this, activity)
+            setViewTreeLifecycleOwner(activity)
+            setViewTreeSavedStateRegistryOwner(activity)
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 PetalExpressiveTheme {
