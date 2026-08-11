@@ -20,7 +20,10 @@ public class Settings_Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         HelperUnit.initTheme(this);
         EdgeToEdge.enable(this);
-        setContentView(PetalSettingsBridge.createSettingsView(this, this::finish));
+        setContentView(PetalSettingsBridge.createSettingsView(this, () -> {
+            finish();
+            return kotlin.Unit.INSTANCE;
+        }));
     }
 
     @Override
