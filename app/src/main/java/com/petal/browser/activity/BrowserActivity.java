@@ -279,14 +279,12 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
         bottom_navigation = dialogViewOverview.findViewById(R.id.bottom_navigation);
         tab_container = dialogViewOverview.findViewById(R.id.listTabs);
         HelperUnit.setupDialog(context, dialogOverview);
-        dialogOverview.show();
 
         MaterialAlertDialogBuilder builderSearch = new MaterialAlertDialogBuilder(context);
         dialogViewSearch = View.inflate(context, R.layout.dialog_search, null);
         builderSearch.setView(dialogViewSearch);
         dialogSearch = builderSearch.create();
         HelperUnit.setupDialog(context, dialogSearch);
-        dialogSearch.show();
 
         BroadcastReceiver downloadReceiver = new BroadcastReceiver() {
             @Override
@@ -329,8 +327,18 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
         if (BrowserContainer.size() < 1) {
             addAlbum(getString(R.string.app_name), sp.getString("favoriteURL", "file:///android_asset/home.html"), true);
         }
-        if (sp.getBoolean("start_tabStart", false) && sp.getBoolean("show_overview", true)) {
-            showOverview();
+
+        // Show Professional Material 3 Welcome Dialog on first launch
+        if (!sp.getBoolean("sp_welcome_shown", false)) {
+            sp.edit().putBoolean("sp_welcome_shown", true).apply();
+            try {
+                contentFrame.removeAllViews();
+                View welcomeView = com.petal.browser.ui.components.PetalWelcomeBridge.createWelcomeView(this, () -> {
+                    showAlbum(currentAlbumController);
+                    return kotlin.Unit.INSTANCE;
+                });
+                contentFrame.addView(welcomeView);
+            } catch (Exception ignored) {}
         }
     }
 
