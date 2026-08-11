@@ -2,6 +2,7 @@
  * PetalHomeScreen.kt
  * ─────────────────────────────────────────────────────────────────────────
  * Material 3 Expressive home screen for Petal Browser with Stride UI components,
+ * Stride Floating Bottom Navigation Bar, Chrome Android-style Live Tab Switcher Badge,
  * IconSwitch toggles, AMOLED dark mode, and Material You dynamic color support.
  */
 
@@ -47,6 +48,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.petal.browser.ui.components.IconSwitch
+import com.petal.browser.ui.components.PetalBottomNavBar
+import com.petal.browser.ui.components.PetalNavTab
 import com.petal.browser.ui.theme.PetalExpressiveTheme
 import kotlin.math.cos
 import kotlin.math.roundToInt
@@ -87,12 +90,14 @@ interface PetalHomeActionHandler {
     fun onOpenHistory()
     fun onOpenDownloads()
     fun onOpenSettings()
+    fun onOpenTabsOverview()
 }
 
 object PetalComposeBridge {
     @JvmStatic
     fun createComposeHomeView(
         context: Context,
+        tabCount: Int,
         handler: PetalHomeActionHandler
     ): ComposeView {
         return ComposeView(context).apply {
@@ -100,6 +105,7 @@ object PetalComposeBridge {
             setContent {
                 PetalExpressiveTheme {
                     PetalHomeScreen(
+                        tabCount = tabCount,
                         onSearch = { handler.onSearch(it) },
                         onOpenShortcut = { handler.onOpenUrl(it.url) },
                         onAddShortcut = { handler.onAddShortcut() },
@@ -107,7 +113,8 @@ object PetalComposeBridge {
                         onOpenBookmarks = { handler.onOpenBookmarks() },
                         onOpenHistory = { handler.onOpenHistory() },
                         onOpenDownloads = { handler.onOpenDownloads() },
-                        onOpenSettings = { handler.onOpenSettings() }
+                        onOpenSettings = { handler.onOpenSettings() },
+                        onTabsClick = { handler.onOpenTabsOverview() }
                     )
                 }
             }
@@ -120,6 +127,7 @@ object PetalComposeBridge {
 @Composable
 fun PetalHomeScreen(
     greetingName: String? = null,
+    tabCount: Int = 1,
     shortcuts: List<PetalShortcut> = defaultPetalShortcuts,
     onSearch: (String) -> Unit = {},
     onOpenShortcut: (PetalShortcut) -> Unit = {},
@@ -129,11 +137,13 @@ fun PetalHomeScreen(
     onOpenHistory: () -> Unit = {},
     onOpenDownloads: () -> Unit = {},
     onOpenSettings: () -> Unit = {},
+    onTabsClick: () -> Unit = {},
 ) {
     var isAmoledEnabled by remember { mutableStateOf(false) }
     var isDynamicColorEnabled by remember { mutableStateOf(true) }
     var isAdBlockEnabled by remember { mutableStateOf(true) }
     var isHttpsOnlyEnabled by remember { mutableStateOf(true) }
+    var selectedNavTab by remember { mutableStateOf(PetalNavTab.HOME) }
 
     PetalExpressiveTheme(
         dynamicColor = isDynamicColorEnabled,
@@ -141,16 +151,34 @@ fun PetalHomeScreen(
     ) {
         Scaffold(
             containerColor = MaterialTheme.colorScheme.background,
-            floatingActionButton = {
-                LargeFloatingActionButton(
-                    onClick = onNewTab,
-                    shape = RoundedCornerShape(24.dp),
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            bottomBar = {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Icon(Icons.Rounded.Tab, contentDescription = "New tab")
+                    PetalBottomNavBar(
+                        selectedTab = selectedNavTab,
+                        tabCount = tabCount,
+                        onHomeClick = {
+                            selectedNavTab = PetalNavTab.HOME
+                        },
+                        onTabsClick = {
+                            selectedNavTab = PetalNavTab.TABS
+                            onTabsClick()
+                        },
+                        onNewTabClick = {
+                            selectedNavTab = PetalNavTab.NEW_TAB
+                            onNewTab()
+                        },
+                        onMenuClick = {
+                            selectedNavTab = PetalNavTab.MENU
+                            onOpenSettings()
+                        }
+                    )
                 }
-            },
+            }
         ) { innerPadding ->
             Column(
                 modifier = Modifier

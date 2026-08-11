@@ -41,6 +41,8 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 
+import com.petal.browser.compose.home.PetalComposeBridge;
+import com.petal.browser.compose.home.PetalHomeActionHandler;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
@@ -431,7 +433,73 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
         currentAlbumController = controller;
         currentAlbumController.activate();
         contentFrame.removeAllViews();
-        contentFrame.addView(av);
+
+        String url = ninjaWebView != null ? ninjaWebView.getUrl() : "";
+        if (url == null || url.isEmpty() || url.startsWith("file:///android_asset/home.html") || url.equals("about:blank")) {
+            View composeView = PetalComposeBridge.createComposeHomeView(this, BrowserContainer.size(), new PetalHomeActionHandler() {
+                @Override
+                public void onSearch(String query) {
+                    if (query != null && !query.trim().isEmpty()) {
+                        ninjaWebView.loadUrl(query);
+                        showAlbum(currentAlbumController);
+                    } else {
+                        if (inputBox != null) inputBox.requestFocus();
+                    }
+                }
+
+                @Override
+                public void onOpenUrl(String u) {
+                    ninjaWebView.loadUrl(u);
+                    showAlbum(currentAlbumController);
+                }
+
+                @Override
+                public void onAddShortcut() {
+                    ninjaWebView.loadUrl("file:///android_asset/home.html");
+                }
+
+                @Override
+                public void onNewTab() {
+                    addAlbum(getString(R.string.app_name), "file:///android_asset/home.html", true);
+                }
+
+                @Override
+                public void onOpenBookmarks() {
+                    try {
+                        Intent intent = new Intent(BrowserActivity.this, BookmarkActivity.class);
+                        startActivity(intent);
+                    } catch (Exception ignored) {}
+                }
+
+                @Override
+                public void onOpenHistory() {
+                    try {
+                        Intent intent = new Intent(BrowserActivity.this, HistoryActivity.class);
+                        startActivity(intent);
+                    } catch (Exception ignored) {}
+                }
+
+                @Override
+                public void onOpenDownloads() {
+                    try {
+                        startActivity(new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS));
+                    } catch (Exception ignored) {}
+                }
+
+                @Override
+                public void onOpenSettings() {
+                    showOverflow(null, null, 0, ninjaWebView != null ? ninjaWebView.getTitle() : "", ninjaWebView != null ? ninjaWebView.getUrl() : "", null, null, 0);
+                }
+
+                @Override
+                public void onOpenTabsOverview() {
+                    showOverview();
+                }
+            });
+            contentFrame.addView(composeView);
+        } else {
+            contentFrame.addView(av);
+        }
         updateOmniBox();
     }
 
