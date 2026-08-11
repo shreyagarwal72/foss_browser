@@ -279,10 +279,19 @@ public class BrowserUnit {
     }
 
     public static void intentURL(Context context, Uri uri) {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW);
-        browserIntent.setData(uri);
-        browserIntent.setPackage("com.petal.browser");
-        context.startActivity(browserIntent);
+        if (context == null || uri == null) return;
+        try {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, uri);
+            context.startActivity(browserIntent);
+        } catch (Exception e) {
+            try {
+                Intent fallbackIntent = new Intent(context, BrowserActivity.class);
+                fallbackIntent.setAction(Intent.ACTION_VIEW);
+                fallbackIntent.setData(uri);
+                fallbackIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(fallbackIntent);
+            } catch (Exception ignored) {}
+        }
     }
 
     public static String redirectURL (WebView ninjaWebView, SharedPreferences sp, String url) {
