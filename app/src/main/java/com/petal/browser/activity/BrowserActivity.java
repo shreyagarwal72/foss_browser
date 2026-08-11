@@ -551,6 +551,7 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
                         }
                     }
                 );
+                bottomNavCompose.bringToFront();
             }
         } catch (Exception ignored) {}
     }
