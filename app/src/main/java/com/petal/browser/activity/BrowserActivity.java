@@ -1004,27 +1004,43 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
             catch (Exception e) {Log.i(TAG, "dialogCustomSearches:" + e);}
         }
 
-        searchOnSiteLayout.setVisibility(GONE);
-        appBar.setVisibility(VISIBLE);
-        searchOnSiteInput.setText("");
-        badgeDrawable.setVisible(BrowserContainer.size() > 1);
-        badgeDrawable.setNumber(BrowserContainer.size());
-        BadgeUtils.attachBadgeDrawable(badgeDrawable, fab_overview, findViewById(R.id.layout));
-        bottom_navigation.getOrCreateBadge(R.id.page_0).setNumber(BrowserContainer.size());
+        try {
+            if (badgeDrawable != null && fab_overview != null && findViewById(R.id.layout) != null) {
+                badgeDrawable.setVisible(BrowserContainer.size() > 1);
+                badgeDrawable.setNumber(BrowserContainer.size());
+                BadgeUtils.attachBadgeDrawable(badgeDrawable, fab_overview, findViewById(R.id.layout));
+            }
+            if (bottom_navigation != null) {
+                bottom_navigation.getOrCreateBadge(R.id.page_0).setNumber(BrowserContainer.size());
+            }
+        } catch (Exception ignored) {}
 
-        ninjaWebView = (NinjaWebView) currentAlbumController;
-        String url = ninjaWebView.getUrl();
-        ninjaWebView.initPreferences(url);
-
-        if (url != null && ninjaWebView.isForeground()) {
-            progressBar.setVisibility(GONE);
-            setProfileIcon(fab_menu, url);
-            if (Objects.requireNonNull(ninjaWebView.getTitle()).isEmpty()) appBar_title.setText(url);
-            else appBar_title.setText(ninjaWebView.getTitle());
-            FaviconHelper.setFavicon(context, contentView, url, R.id.menu_icon, R.drawable.icon_image_broken);
+        if (currentAlbumController instanceof NinjaWebView) {
+            ninjaWebView = (NinjaWebView) currentAlbumController;
+            String url = ninjaWebView.getUrl();
+            if (url != null) {
+                ninjaWebView.initPreferences(url);
+                if (ninjaWebView.isForeground()) {
+                    progressBar.setVisibility(GONE);
+                    if (fab_menu != null) setProfileIcon(fab_menu, url);
+                    if (appBar_title != null) {
+                        String title = ninjaWebView.getTitle();
+                        appBar_title.setText(title != null && !title.isEmpty() ? title : url);
+                    }
+                    if (contentView != null) {
+                        FaviconHelper.setFavicon(context, contentView, url, R.id.menu_icon, R.drawable.icon_image_broken);
+                    }
+                    TextView overflowURL = findViewById(R.id.appbar_URL);
+                    if (overflowURL != null) {
+                        overflowURL.setText(url);
+                        HelperUnit.setHighLightedText(context, overflowURL, url, HelperUnit.domain(url));
+                    }
+                }
+            }
+        } else {
+            if (appBar_title != null) appBar_title.setText(getString(R.string.app_name));
             TextView overflowURL = findViewById(R.id.appbar_URL);
-            overflowURL.setText(url);
-            HelperUnit.setHighLightedText(context, overflowURL, url, HelperUnit.domain(url));
+            if (overflowURL != null) overflowURL.setText("file:///android_asset/home.html");
         }
     }
 
