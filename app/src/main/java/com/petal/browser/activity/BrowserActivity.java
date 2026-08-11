@@ -333,12 +333,9 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
         if (!sp.getBoolean("sp_welcome_shown", false)) {
             sp.edit().putBoolean("sp_welcome_shown", true).apply();
             try {
-                contentFrame.removeAllViews();
-                View welcomeView = com.petal.browser.ui.components.PetalWelcomeBridge.createWelcomeView(this, () -> {
-                    showAlbum(currentAlbumController);
+                com.petal.browser.ui.components.PetalWelcomeBridge.showWelcomeDialog(this, () -> {
                     return kotlin.Unit.INSTANCE;
                 });
-                contentFrame.addView(welcomeView);
             } catch (Exception ignored) {}
         }
     }

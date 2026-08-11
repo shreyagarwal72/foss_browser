@@ -30,18 +30,34 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.activity.ComponentActivity
+import androidx.lifecycle.setViewTreeLifecycleOwner
+import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.petal.browser.ui.theme.PetalExpressiveTheme
 
 object PetalWelcomeBridge {
     @JvmStatic
-    fun createWelcomeView(context: Context, onGetStarted: () -> Unit): ComposeView {
-        return ComposeView(context).apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                PetalExpressiveTheme {
-                    PetalWelcomeScreen(onGetStarted = onGetStarted)
+    fun showWelcomeDialog(activity: ComponentActivity, onGetStarted: () -> Unit) {
+        try {
+            val dialog = BottomSheetDialog(activity)
+            val composeView = ComposeView(activity).apply {
+                setViewTreeLifecycleOwner(activity)
+                setViewTreeSavedStateRegistryOwner(activity)
+                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+                setContent {
+                    PetalExpressiveTheme {
+                        PetalWelcomeScreen(onGetStarted = {
+                            try { dialog.dismiss() } catch (ignored: Exception) {}
+                            onGetStarted()
+                        })
+                    }
                 }
             }
+            dialog.setContentView(composeView)
+            dialog.show()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }
