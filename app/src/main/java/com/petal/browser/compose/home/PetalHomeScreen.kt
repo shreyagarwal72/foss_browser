@@ -156,35 +156,7 @@ fun PetalHomeScreen(
         useAmoled = isAmoledEnabled
     ) {
         Scaffold(
-            containerColor = MaterialTheme.colorScheme.background,
-            bottomBar = {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    PetalBottomNavBar(
-                        selectedTab = selectedNavTab,
-                        tabCount = tabCount,
-                        onHomeClick = {
-                            selectedNavTab = PetalNavTab.HOME
-                        },
-                        onTabsClick = {
-                            selectedNavTab = PetalNavTab.TABS
-                            onTabsClick()
-                        },
-                        onNewTabClick = {
-                            selectedNavTab = PetalNavTab.NEW_TAB
-                            onNewTab()
-                        },
-                        onMenuClick = {
-                            selectedNavTab = PetalNavTab.MENU
-                            onOpenSettings()
-                        }
-                    )
-                }
-            }
+            containerColor = MaterialTheme.colorScheme.background
         ) { innerPadding ->
             Column(
                 modifier = Modifier

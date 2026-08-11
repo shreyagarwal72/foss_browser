@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.sp
 
 /**
  * Refined Material 3 Expressive Options Sheet / Dialog for Petal Browser featuring
- * Stride IconSwitches, quick action grid, rounded 32.dp sheet container, and bouncy physics.
+ * Stride IconSwitches, quick action grid, spring animations, rounded 32.dp sheet container, and bouncy physics.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,12 +53,15 @@ fun PetalOptionsSheet(
             Text(
                 text = "Browser Options",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.entrance(index = 0)
             )
 
-            // Top Quick Grid Action Tiles
+            // Top Quick Grid Action Tiles with Stride Bouncy Animation
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .entrance(index = 1),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 OptionTile(Icons.Rounded.Add, "New Tab", Modifier.weight(1f)) {
@@ -82,7 +85,10 @@ fun PetalOptionsSheet(
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
 
             // Toggles with Stride IconSwitches
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Column(
+                modifier = Modifier.entrance(index = 2),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
                 // Desktop Site Toggle
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -135,7 +141,10 @@ fun PetalOptionsSheet(
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
 
             // List Actions
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Column(
+                modifier = Modifier.entrance(index = 3),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
                 OptionRowItem(Icons.Rounded.Search, "Find in Page") {
                     onFindInPage()
                     onDismiss()
@@ -163,10 +172,11 @@ private fun OptionTile(
     onClick: () -> Unit
 ) {
     Surface(
-        onClick = onClick,
         shape = RoundedCornerShape(18.dp),
         color = MaterialTheme.colorScheme.surfaceContainer,
-        modifier = modifier.height(72.dp)
+        modifier = modifier
+            .height(72.dp)
+            .bouncyClickable(scaleDown = 0.92f, onClick = onClick)
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -187,10 +197,12 @@ private fun OptionRowItem(
     onClick: () -> Unit
 ) {
     Surface(
-        onClick = onClick,
         shape = RoundedCornerShape(14.dp),
         color = androidx.compose.ui.graphics.Color.Transparent,
-        modifier = Modifier.fillMaxWidth().height(48.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp)
+            .bouncyClickable(scaleDown = 0.96f, onClick = onClick)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
