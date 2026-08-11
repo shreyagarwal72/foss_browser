@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'org.jetbrains.kotlin.plugin.compose'
 
 android {
 
@@ -15,10 +16,6 @@ android {
 
     buildFeatures {
         compose true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion '1.5.14'
     }
 
     defaultConfig {
@@ -57,6 +54,16 @@ android {
     namespace 'com.petal.browser'
 
     return void
+}
+
+configurations.all {
+    resolutionStrategy {
+        force 'org.jetbrains.kotlin:kotlin-stdlib:2.0.21'
+        force 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.21'
+        force 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.21'
+        force 'org.jetbrains.kotlin:kotlin-stdlib-common:2.0.21'
+        force 'org.jetbrains.kotlin:kotlin-reflect:2.0.21'
+    }
 }
 
 dependencies {
