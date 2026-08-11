@@ -9,6 +9,9 @@
 package com.petal.browser.compose.home
 
 import android.content.Context
+import androidx.activity.ComponentActivity
+import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -98,13 +101,13 @@ interface PetalHomeActionHandler {
 object PetalComposeBridge {
     @JvmStatic
     fun createComposeHomeView(
-        activity: androidx.activity.ComponentActivity,
+        activity: ComponentActivity,
         tabCount: Int,
         handler: PetalHomeActionHandler
     ): ComposeView {
         return ComposeView(activity).apply {
-            androidx.lifecycle.ViewTreeLifecycleOwner.set(this, activity)
-            androidx.savedstate.ViewTreeSavedStateRegistryOwner.set(this, activity)
+            ViewTreeLifecycleOwner.set(this, activity)
+            ViewTreeSavedStateRegistryOwner.set(this, activity)
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 PetalExpressiveTheme {
