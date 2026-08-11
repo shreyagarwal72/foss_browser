@@ -41,6 +41,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 
+import com.petal.browser.compose.downloads.PetalDownloadBridge;
 import com.petal.browser.compose.home.PetalComposeBridge;
 import com.petal.browser.compose.home.PetalHomeActionHandler;
 import android.util.Log;
@@ -480,7 +481,12 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
                 @Override
                 public void onOpenDownloads() {
                     try {
-                        startActivity(new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS));
+                        contentFrame.removeAllViews();
+                        View downloadView = PetalDownloadBridge.createDownloadView(BrowserActivity.this, () -> {
+                            showAlbum(currentAlbumController);
+                            return kotlin.Unit.INSTANCE;
+                        });
+                        contentFrame.addView(downloadView);
                     } catch (Exception ignored) {}
                 }
 
@@ -499,6 +505,46 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
             contentFrame.addView(av);
         }
         updateOmniBox();
+        updatePersistentBottomNav();
+    }
+
+    private void updatePersistentBottomNav() {
+        try {
+            androidx.compose.ui.platform.ComposeView bottomNavCompose = findViewById(R.id.bottom_nav_compose);
+            if (bottomNavCompose != null) {
+                String currentUrl = ninjaWebView != null ? ninjaWebView.getUrl() : "";
+                boolean isHome = currentUrl == null || currentUrl.isEmpty() || currentUrl.startsWith("file:///android_asset/home.html") || currentUrl.equals("about:blank");
+                com.petal.browser.ui.components.PetalNavTab activeTab = isHome ? com.petal.browser.ui.components.PetalNavTab.HOME : com.petal.browser.ui.components.PetalNavTab.TABS;
+
+                com.petal.browser.compose.home.PetalBottomNavBridge.bindBottomNav(
+                    bottomNavCompose,
+                    activeTab,
+                    BrowserContainer.size(),
+                    new com.petal.browser.compose.home.PetalBottomNavHandler() {
+                        @Override
+                        public void onHomeClick() {
+                            if (ninjaWebView != null) ninjaWebView.loadUrl("file:///android_asset/home.html");
+                            showAlbum(currentAlbumController);
+                        }
+
+                        @Override
+                        public void onNewTabClick() {
+                            addAlbum(getString(R.string.app_name), "file:///android_asset/home.html", true);
+                        }
+
+                        @Override
+                        public void onTabsClick() {
+                            showOverview();
+                        }
+
+                        @Override
+                        public void onMenuClick() {
+                            showOverflow(null, null, 0, ninjaWebView != null ? ninjaWebView.getTitle() : "", ninjaWebView != null ? ninjaWebView.getUrl() : "", null, null, 0);
+                        }
+                    }
+                );
+            }
+        } catch (Exception ignored) {}
     }
 
     @Override

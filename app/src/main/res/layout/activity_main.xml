@@ -7,28 +7,7 @@
     android:id="@+id/main"
     tools:ignore="ContentDescription">
 
-    <FrameLayout
-        android:id="@+id/main_content"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_showAppBar"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="16dp"
-        android:src="@drawable/icon_up"
-        app:elevation="2dp"
-        style="@style/Widget.Material3.Button.IconButton.Outlined"
-        app:backgroundTint="?attr/colorSurfaceContainerHighest"
-        app:borderWidth="0.5dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        app:maxImageSize="20dp"
-        app:fabCustomSize="42dp" />
-
+    <!-- Top Address Bar (Omnibox) -->
     <com.google.android.material.card.MaterialCardView
         style="@style/Widget.Material3.CardView.Elevated"
         android:backgroundTint="?attr/colorSurfaceContainerHigh"
@@ -39,8 +18,8 @@
         android:layout_height="64dp"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
-        android:layout_marginBottom="12dp"
-        android:layout_alignParentBottom="true"
+        android:layout_marginTop="12dp"
+        android:layout_alignParentTop="true"
         app:cardCornerRadius="28dp">
 
         <LinearLayout
@@ -106,24 +85,15 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <com.google.android.material.progressindicator.LinearProgressIndicator
-        android:id="@+id/main_progress_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        app:indicatorColor="?attr/colorPrimary"
-        app:trackColor="?attr/colorSurfaceVariant"
-        app:trackThickness="4dp"/>
-
     <LinearLayout
         android:id="@+id/appBar_buttons"
         android:layout_width="wrap_content"
         android:layout_height="64dp"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
         android:orientation="horizontal"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="12dp"
+        android:layout_marginTop="12dp"
         tools:ignore="RelativeOverlap">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -155,6 +125,44 @@
 
     </LinearLayout>
 
+    <!-- Top Loading Progress Line -->
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/main_progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/appBar"
+        app:indicatorColor="?attr/colorPrimary"
+        app:trackColor="?attr/colorSurfaceVariant"
+        app:trackThickness="4dp"/>
+
+    <!-- Main Web Content Container -->
+    <FrameLayout
+        android:id="@+id/main_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/main_progress_bar"
+        android:layout_above="@+id/bottom_nav_compose"/>
+
+    <!-- Floating Action Button for Showing Top Bar -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_showAppBar"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/icon_up"
+        app:elevation="2dp"
+        style="@style/Widget.Material3.Button.IconButton.Outlined"
+        app:backgroundTint="?attr/colorSurfaceContainerHighest"
+        app:borderWidth="0.5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        app:maxImageSize="20dp"
+        app:fabCustomSize="42dp"
+        android:visibility="gone"/>
+
+    <!-- Search On Site Bar -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/searchOnSiteLayout"
         android:visibility="gone"
@@ -165,7 +173,7 @@
         android:layout_width="match_parent"
         android:layout_height="72dp"
         android:layout_margin="12dp"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
         app:cardCornerRadius="28dp"
         android:orientation="vertical">
 
@@ -188,7 +196,7 @@
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_alignParentBottom="true"
+                android:layout_alignParentTop="true"
                 android:layout_toStartOf="@+id/searchOnSite_buttonClose"
                 android:paddingEnd="10dp"
                 android:paddingStart="10dp"
@@ -217,5 +225,13 @@
         </RelativeLayout>
 
     </com.google.android.material.card.MaterialCardView>
+
+    <!-- Persistent Stride Floating Bottom Navigation Bar (Compose Container) -->
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/bottom_nav_compose"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="12dp"/>
 
 </RelativeLayout>

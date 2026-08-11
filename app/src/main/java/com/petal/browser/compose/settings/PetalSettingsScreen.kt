@@ -167,10 +167,20 @@ fun PetalSettingsScreen(onBackPress: () -> Unit = {}) {
                 // 3. Display & Scaling Sliders (using StrideSlider)
                 SettingsCategoryCard(title = "Display & Font Scaling", icon = Icons.Rounded.FormatSize) {
                     // Font Size StrideSlider
-                    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 6.dp)
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceContainer,
+                                shape = RoundedCornerShape(18.dp)
+                            )
+                            .padding(14.dp)
+                    ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
                                 "Text Font Scale",
@@ -179,28 +189,37 @@ fun PetalSettingsScreen(onBackPress: () -> Unit = {}) {
                             )
                             Text(
                                 "${(fontSize * 100f).toInt()}%",
-                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                                 color = MaterialTheme.colorScheme.primary
                             )
                         }
-                        Spacer(Modifier.height(6.dp))
+                        Spacer(Modifier.height(10.dp))
                         StrideSlider(
                             value = fontSize,
                             onValueChange = { newValue ->
                                 fontSize = newValue
                                 sp.edit().putFloat("sp_font_size_scale", newValue).apply()
                             },
-                            valueRange = 0.7f..1.5f
+                            valueRange = 0.7f..1.5f,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
 
-                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
-
                     // Page Zoom StrideSlider
-                    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 6.dp)
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceContainer,
+                                shape = RoundedCornerShape(18.dp)
+                            )
+                            .padding(14.dp)
+                    ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
                                 "Default Page Zoom",
@@ -209,18 +228,19 @@ fun PetalSettingsScreen(onBackPress: () -> Unit = {}) {
                             )
                             Text(
                                 "${(zoomLevel * 100f).toInt()}%",
-                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                                 color = MaterialTheme.colorScheme.primary
                             )
                         }
-                        Spacer(Modifier.height(6.dp))
+                        Spacer(Modifier.height(10.dp))
                         StrideSlider(
                             value = zoomLevel,
                             onValueChange = { newValue ->
                                 zoomLevel = newValue
                                 sp.edit().putFloat("sp_zoom_level_scale", newValue).apply()
                             },
-                            valueRange = 0.8f..2.0f
+                            valueRange = 0.8f..2.0f,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }

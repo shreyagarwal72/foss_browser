@@ -39,20 +39,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 enum class PetalNavTab {
-    HOME, TABS, NEW_TAB, MENU
+    HOME, NEW_TAB, TABS, MENU
 }
 
 /**
- * Expressive Stride Floating Depth Bottom Navigation Bar with fluid liquid spring physics,
- * primary spot-color depth glow, Chrome Android live tab counter badge, and GPU-accelerated lagless transitions.
+ * Expressive Stride Floating Depth Bottom Navigation Bar.
+ * Order:
+ * 1st: Home Page button
+ * 2nd: (+) New Tab button
+ * 3rd: Chrome Android Live Tab Counter & Switcher Badge ([1], [2], [3])
+ * 4th: Menu / Options button
  */
 @Composable
 fun PetalBottomNavBar(
     selectedTab: PetalNavTab,
     tabCount: Int,
     onHomeClick: () -> Unit,
-    onTabsClick: () -> Unit,
     onNewTabClick: () -> Unit,
+    onTabsClick: () -> Unit,
     onMenuClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -87,7 +91,21 @@ fun PetalBottomNavBar(
                 )
             }
 
-            // 2nd Item: Live Tab Switcher (Chrome Android Style Badge with Fluid Spring Scaling)
+            // 2nd Item: (+) New Tab
+            NavItemPill(
+                selected = selectedTab == PetalNavTab.NEW_TAB,
+                label = "New",
+                onClick = onNewTabClick
+            ) { color ->
+                Icon(
+                    imageVector = Icons.Rounded.Add,
+                    contentDescription = "New Tab",
+                    tint = color,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+
+            // 3rd Item: Live Tab Switcher (Chrome Android Style Badge)
             NavItemPill(
                 selected = selectedTab == PetalNavTab.TABS,
                 label = "Tabs ($tabCount)",
@@ -115,20 +133,6 @@ fun PetalBottomNavBar(
                 }
             }
 
-            // 3rd Item: New Tab (+)
-            NavItemPill(
-                selected = selectedTab == PetalNavTab.NEW_TAB,
-                label = "New",
-                onClick = onNewTabClick
-            ) { color ->
-                Icon(
-                    imageVector = Icons.Rounded.Add,
-                    contentDescription = "New Tab",
-                    tint = color,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-
             // 4th Item: Menu / Options
             NavItemPill(
                 selected = selectedTab == PetalNavTab.MENU,
@@ -153,7 +157,6 @@ private fun NavItemPill(
     onClick: () -> Unit,
     iconContent: @Composable (Color) -> Unit
 ) {
-    // High-performance GPU accelerated float scaling animation
     val scale by animateFloatAsState(
         targetValue = if (selected) 1.12f else 1.0f,
         animationSpec = spring(
