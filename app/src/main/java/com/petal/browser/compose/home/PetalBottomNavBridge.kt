@@ -3,11 +3,7 @@ package com.petal.browser.compose.home
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.lifecycle.ViewTreeLifecycleOwner
-import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeLifecycleOwner
-import androidx.savedstate.ViewTreeSavedStateRegistryOwner
-import androidx.savedstate.findViewTreeSavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.petal.browser.ui.components.PetalBottomNavBar
 import com.petal.browser.ui.components.PetalNavTab
