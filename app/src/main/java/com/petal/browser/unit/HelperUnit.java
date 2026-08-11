@@ -288,21 +288,14 @@ public class HelperUnit {
         }
     }
     public static void initTheme(Activity context) {
-        sp = PreferenceManager.getDefaultSharedPreferences(context);
-        if (sp.getBoolean("useDynamicColor", false)) {
-            switch (Objects.requireNonNull(sp.getString("sp_theme", "1"))) {
-                case "2":
-                    context.setTheme(R.style.AppTheme_wallpaper_day);
-                    break;
-                case "3":
-                    context.setTheme(R.style.AppTheme_wallpaper_night);
-                    break;
-                default:
-                    context.setTheme(R.style.AppTheme_wallpaper);
-                    break;
-            }
-        } else {
+        try {
+            sp = PreferenceManager.getDefaultSharedPreferences(context);
             context.setTheme(R.style.AppTheme);
+            if (sp.getBoolean("useDynamicColor", true)) {
+                com.google.android.material.color.DynamicColors.applyToActivityIfAvailable(context);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
