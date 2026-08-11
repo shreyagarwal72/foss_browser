@@ -10,8 +10,7 @@ local.properties
 # Eclipse project files
 # Android Studio
 .idea/
-.gradle
-gradle
+.gradle/
 *.iml
 /app/debug/
 /app/release/
