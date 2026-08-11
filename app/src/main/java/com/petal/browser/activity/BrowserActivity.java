@@ -234,8 +234,9 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
         activity = BrowserActivity.this;
         context = BrowserActivity.this;
         sp = PreferenceManager.getDefaultSharedPreferences(context);
-        //noinspection InstantiationOfUtilityClass
-        new BannerBlock(context);
+        try {
+            new BannerBlock(context);
+        } catch (Exception ignored) {}
         HelperUnit.initTheme(activity);
 
         if (sp.getBoolean("sp_screenOn", false)) getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);

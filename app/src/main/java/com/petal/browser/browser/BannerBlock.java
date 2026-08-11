@@ -35,14 +35,15 @@ public class BannerBlock {
     private static void loadHosts(final Context context) {
         try {
             File file = new File(context.getDir("filesdir", Context.MODE_PRIVATE) + "/"+FILE);
-            String jsonDataString =  new String(Files.readAllBytes(Paths.get(file.getPath())));
+            if (!file.exists()) return;
+            String jsonDataString = new String(Files.readAllBytes(Paths.get(file.getPath())));
             JSONObject jsonData = new JSONObject(jsonDataString);
-            JSONArray data = jsonData.getJSONArray("data");
-            configString = data.toString().replaceAll("\\\\\"", "\\\\\\\\\"");
-        } catch (IOException e) {
+            if (jsonData.has("data")) {
+                JSONArray data = jsonData.getJSONArray("data");
+                configString = data.toString().replaceAll("\\\\\"", "\\\\\\\\\"");
+            }
+        } catch (Exception e) {
             Log.i(TAG, "Petal: loadHosts:" + e);
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
         }
     }
     public static void downloadBanners(final Context context) {
