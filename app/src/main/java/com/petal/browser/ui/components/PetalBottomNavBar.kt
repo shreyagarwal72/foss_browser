@@ -4,11 +4,13 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -17,17 +19,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.MoreVert
-import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
@@ -40,8 +43,8 @@ enum class PetalNavTab {
 }
 
 /**
- * Floating bottom navigation bar modeled after StrideFloatingNav,
- * featuring Home, Chrome Android-style live Tab Counter & Switcher, New Tab (+), and Menu.
+ * Expressive Stride Floating Depth Bottom Navigation Bar with fluid liquid spring physics,
+ * primary spot-color depth glow, Chrome Android live tab counter badge, and GPU-accelerated lagless transitions.
  */
 @Composable
 fun PetalBottomNavBar(
@@ -54,13 +57,19 @@ fun PetalBottomNavBar(
     modifier: Modifier = Modifier,
 ) {
     Surface(
-        shape = CircleShape,
+        shape = RoundedCornerShape(36.dp),
         color = MaterialTheme.colorScheme.surfaceContainerHigh,
-        shadowElevation = 14.dp,
-        modifier = modifier,
+        modifier = modifier
+            .shadow(
+                elevation = 16.dp,
+                shape = RoundedCornerShape(36.dp),
+                spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+            )
+            .clip(RoundedCornerShape(36.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
@@ -78,7 +87,7 @@ fun PetalBottomNavBar(
                 )
             }
 
-            // 2nd Item: Live Tab Switcher (Chrome Android Style Badge)
+            // 2nd Item: Live Tab Switcher (Chrome Android Style Badge with Fluid Spring Scaling)
             NavItemPill(
                 selected = selectedTab == PetalNavTab.TABS,
                 label = "Tabs ($tabCount)",
@@ -120,7 +129,7 @@ fun PetalBottomNavBar(
                 )
             }
 
-            // 4th Item: Menu
+            // 4th Item: Menu / Options
             NavItemPill(
                 selected = selectedTab == PetalNavTab.MENU,
                 label = "Menu",
@@ -144,20 +153,15 @@ private fun NavItemPill(
     onClick: () -> Unit,
     iconContent: @Composable (Color) -> Unit
 ) {
-    val pop = remember { Animatable(1f) }
-
-    LaunchedEffect(selected) {
-        if (selected) {
-            pop.snapTo(0.7f)
-            pop.animateTo(
-                1f,
-                spring(
-                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessMedium,
-                ),
-            )
-        }
-    }
+    // High-performance GPU accelerated float scaling animation
+    val scale by animateFloatAsState(
+        targetValue = if (selected) 1.12f else 1.0f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = 220f
+        ),
+        label = "navPillScale"
+    )
 
     val contentColor = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
     val containerColor = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent
@@ -168,20 +172,25 @@ private fun NavItemPill(
         modifier = Modifier
             .bouncyClickable(scaleDown = 0.88f, onClick = onClick)
             .clip(CircleShape)
-            .animateContentSize(),
+            .animateContentSize(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioNoBouncy,
+                    stiffness = 400f
+                )
+            ),
     ) {
         Row(
             modifier = Modifier.padding(
-                horizontal = if (selected) 14.dp else 8.dp,
-                vertical = 8.dp,
+                horizontal = if (selected) 16.dp else 10.dp,
+                vertical = 10.dp,
             ),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             Box(
                 modifier = Modifier.graphicsLayer {
-                    scaleX = pop.value
-                    scaleY = pop.value
+                    scaleX = scale
+                    scaleY = scale
                 }
             ) {
                 iconContent(contentColor)
