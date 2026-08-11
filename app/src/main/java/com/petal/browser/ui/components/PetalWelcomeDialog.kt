@@ -1,7 +1,7 @@
 /*
  * PetalWelcomeDialog.kt
  * ─────────────────────────────────────────────────────────────────────────
- * Professional Material 3 Welcome & Onboarding Sheet for Petal Browser.
+ * Professional Material 3 Welcome & Onboarding Screen for Petal Browser.
  */
 
 package com.petal.browser.ui.components
@@ -9,12 +9,13 @@ package com.petal.browser.ui.components
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.Bolt
-import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material3.*
@@ -38,101 +39,108 @@ object PetalWelcomeBridge {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 PetalExpressiveTheme {
-                    PetalWelcomeSheet(onGetStarted = onGetStarted)
+                    PetalWelcomeScreen(onGetStarted = onGetStarted)
                 }
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PetalWelcomeSheet(onGetStarted: () -> Unit) {
-    ModalBottomSheet(
-        onDismissRequest = onGetStarted,
-        shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
-        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-        dragHandle = {
-            BottomSheetDefaults.DragHandle(
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
-            )
-        }
-    ) {
+fun PetalWelcomeScreen(onGetStarted: () -> Unit) {
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.background
+    ) { innerPadding ->
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 12.dp),
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 28.dp, vertical = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            verticalArrangement = Arrangement.Center
         ) {
-            // Icon Badge
+            Spacer(Modifier.height(16.dp))
+
+            // Hero Icon Badge
             Surface(
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.primaryContainer,
-                modifier = Modifier.size(72.dp)
+                modifier = Modifier
+                    .size(88.dp)
+                    .entrance(index = 0)
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         Icons.Rounded.Shield,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.size(36.dp)
+                        modifier = Modifier.size(44.dp)
                     )
                 }
             }
 
+            Spacer(Modifier.height(24.dp))
+
             // Title & Subtitle
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.entrance(index = 1)
+            ) {
                 Text(
-                    text = "Welcome to Petal Browser",
-                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                    text = "Welcome to Petal",
+                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.ExtraBold),
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center
                 )
-                Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(8.dp))
                 Text(
-                    text = "Fast, private, and beautifully crafted with Material 3 & Stride components.",
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = "Experience rapid web browsing, absolute privacy, and expressive Stride Material 3 components.",
+                    style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
                 )
             }
 
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+            Spacer(Modifier.height(32.dp))
 
-            // Highlights List
-            Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                FeatureRow(
+            // Feature Cards
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.entrance(index = 2)
+            ) {
+                FeatureCard(
                     icon = Icons.Rounded.Shield,
                     title = "Built-in Privacy Shield",
-                    description = "Automatic ad, tracker, and HTTPS security protection."
+                    description = "Automated ad blocking, tracker protection, and HTTPS enforcement."
                 )
-                FeatureRow(
+                FeatureCard(
                     icon = Icons.Rounded.Bolt,
-                    title = "High Speed Performance",
-                    description = "Lightweight engine tuned for rapid web page loading."
+                    title = "Lightning Speed",
+                    description = "Optimized rendering engine tuned for instantaneous load times."
                 )
-                FeatureRow(
+                FeatureCard(
                     icon = Icons.Rounded.Palette,
                     title = "Material You & AMOLED Black",
-                    description = "Dynamic wallpaper palette & pitch black OLED dark mode."
+                    description = "Android 12+ wallpaper dynamic colors & OLED dark mode."
                 )
             }
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(36.dp))
 
-            // Primary Get Started Button
+            // Get Started Button
             Button(
                 onClick = onGetStarted,
-                shape = RoundedCornerShape(24.dp),
+                shape = RoundedCornerShape(26.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(54.dp)
-                    .bouncyClickable(scaleDown = 0.95f, onClick = onGetStarted)
+                    .height(56.dp)
+                    .bouncyClickable(scaleDown = 0.94f, onClick = onGetStarted)
+                    .entrance(index = 3)
             ) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -146,34 +154,41 @@ fun PetalWelcomeSheet(onGetStarted: () -> Unit) {
                 }
             }
 
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(24.dp))
         }
     }
 }
 
 @Composable
-private fun FeatureRow(
+private fun FeatureCard(
     icon: ImageVector,
     title: String,
     description: String
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(14.dp),
-        verticalAlignment = Alignment.CenterVertically
+    Surface(
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Surface(
-            shape = RoundedCornerShape(14.dp),
-            color = MaterialTheme.colorScheme.surfaceContainer,
-            modifier = Modifier.size(44.dp)
+        Row(
+            modifier = Modifier.padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
+            Surface(
+                shape = RoundedCornerShape(14.dp),
+                color = MaterialTheme.colorScheme.primaryContainer,
+                modifier = Modifier.size(46.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(24.dp))
+                }
             }
-        }
-        Column(modifier = Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.onSurface)
-            Text(description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Column(modifier = Modifier.weight(1f)) {
+                Text(title, style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.onSurface)
+                Spacer(Modifier.height(2.dp))
+                Text(description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
         }
     }
 }
