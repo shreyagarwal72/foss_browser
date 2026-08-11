@@ -56,8 +56,8 @@ fun PetalSettingsScreen(onBackPress: () -> Unit = {}) {
     var isAdBlock by remember { mutableStateOf(sp.getBoolean("sp_ad_block", true)) }
     var isHttpsOnly by remember { mutableStateOf(sp.getBoolean("sp_https_only", true)) }
     var isJavaScript by remember { mutableStateOf(sp.getBoolean("sp_javascript", true)) }
-    var fontSize by remember { mutableStateFloatStateOf(sp.getFloat("sp_font_size_scale", 1.0f)) }
-    var zoomLevel by remember { mutableStateFloatStateOf(sp.getFloat("sp_zoom_level_scale", 1.0f)) }
+    var fontSize by remember { mutableFloatStateOf(sp.getFloat("sp_font_size_scale", 1.0f)) }
+    var zoomLevel by remember { mutableFloatStateOf(sp.getFloat("sp_zoom_level_scale", 1.0f)) }
 
     PetalExpressiveTheme(
         dynamicColor = isDynamicColor,
@@ -178,7 +178,7 @@ fun PetalSettingsScreen(onBackPress: () -> Unit = {}) {
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                "${(fontSize * 100).toInt()}%",
+                                "${(fontSize * 100f).toInt()}%",
                                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                                 color = MaterialTheme.colorScheme.primary
                             )
@@ -208,7 +208,7 @@ fun PetalSettingsScreen(onBackPress: () -> Unit = {}) {
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                "${(zoomLevel * 100).toInt()}%",
+                                "${(zoomLevel * 100f).toInt()}%",
                                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                                 color = MaterialTheme.colorScheme.primary
                             )
