@@ -42,7 +42,7 @@
           da "adjustPan" das Layout oft unkontrolliert verschiebt und Eingabefelder verdeckt.
         -->
         <activity
-            android:name="de.baumann.browser.activity.BrowserActivity"
+            android:name="com.petal.browser.activity.BrowserActivity"
             android:configChanges="orientation|uiMode|screenSize|smallestScreenSize|screenLayout"
             android:windowSoftInputMode="adjustResize"
             android:fitsSystemWindows="false"
@@ -125,14 +125,14 @@
           WICHTIG ab Android 12+: Müssen explizit android:exported="false" deklariert werden,
           da sie nur App-intern aufgerufen werden und sonst ein Sicherheitsrisiko darstellen!
         -->
-        <activity android:name="de.baumann.browser.activity.Settings_Activity" android:label="@string/setting_title_browser" android:exported="false" />
-        <activity android:name="de.baumann.browser.activity.Settings_ProfileList" android:label="@string/setting_title_savedWebSites" android:exported="false" />
-        <activity android:name="de.baumann.browser.activity.Settings_Delete" android:label="@string/menu_delete" android:exported="false" />
-        <activity android:name="de.baumann.browser.activity.Settings_Backup" android:label="@string/setting_title_data" android:exported="false" />
-        <activity android:name="de.baumann.browser.activity.Settings_Gesture" android:label="@string/setting_gestures" android:exported="false" />
-        <activity android:name="de.baumann.browser.activity.Settings_Filter" android:label="@string/setting_filter" android:exported="false" />
-        <activity android:name="de.baumann.browser.activity.Settings_Profile" android:label="@string/setting_title_profiles_standard" android:exported="false" />
-        <activity android:name="de.baumann.browser.activity.Settings_Menu" android:label="@string/setting_menu" android:exported="false" />
+        <activity android:name="com.petal.browser.activity.Settings_Activity" android:label="@string/setting_title_browser" android:exported="false" />
+        <activity android:name="com.petal.browser.activity.Settings_ProfileList" android:label="@string/setting_title_savedWebSites" android:exported="false" />
+        <activity android:name="com.petal.browser.activity.Settings_Delete" android:label="@string/menu_delete" android:exported="false" />
+        <activity android:name="com.petal.browser.activity.Settings_Backup" android:label="@string/setting_title_data" android:exported="false" />
+        <activity android:name="com.petal.browser.activity.Settings_Gesture" android:label="@string/setting_gestures" android:exported="false" />
+        <activity android:name="com.petal.browser.activity.Settings_Filter" android:label="@string/setting_filter" android:exported="false" />
+        <activity android:name="com.petal.browser.activity.Settings_Profile" android:label="@string/setting_title_profiles_standard" android:exported="false" />
+        <activity android:name="com.petal.browser.activity.Settings_Menu" android:label="@string/setting_menu" android:exported="false" />
 
     </application>
 

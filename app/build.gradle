@@ -9,7 +9,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "de.baumann.browser"
+        applicationId "com.petal.browser"
         minSdkVersion 26
         targetSdkVersion 36
         versionCode 158
@@ -28,7 +28,7 @@ android {
         checkReleaseBuilds false
         disable 'MissingTranslation'
     }
-    namespace 'de.baumann.browser'
+    namespace 'com.petal.browser'
 
     return void
 }

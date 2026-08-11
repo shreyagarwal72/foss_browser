@@ -6,7 +6,7 @@
     <PreferenceCategory android:title="@string/setting_title_ui">
 
         <EditTextPreference
-            android:defaultValue="https://codeberg.org/Gaukler_Faun/FOSS_Browser/wiki"
+            android:defaultValue="file:///android_asset/home.html"
             android:key="favoriteURL"
             android:title="@string/setting_title_fav"
             android:icon="@drawable/icon_fav" />
@@ -18,7 +18,7 @@
             android:summary="@string/dialog_postOnWebsiteHint"
             android:icon="@drawable/icon_post" />
 
-        <de.baumann.browser.preferences.ListSwitchPreference
+        <com.petal.browser.preferences.ListSwitchPreference
             android:defaultValue="3"
             android:entries="@array/setting_entries_tab"
             android:entryValues="@array/setting_values_tab"
@@ -89,14 +89,14 @@
             android:key="sp_search_engine"
             android:title="@string/setting_title_search_engine" />
 
-        <de.baumann.browser.preferences.EditTextSwitchPreference
+        <com.petal.browser.preferences.EditTextSwitchPreference
             android:key="sp_search_engine_custom"
             android:selectable="true"
             android:title="@string/setting_title_searchEngine"
             app:editTextSwitchKey="searchEngineSwitch"
             app:useSimpleSummaryProvider="true" />
 
-        <de.baumann.browser.preferences.EditTextSwitchPreference
+        <com.petal.browser.preferences.EditTextSwitchPreference
             android:key="sp_userAgent"
             android:selectable="true"
             android:title="@string/setting_title_userAgent"

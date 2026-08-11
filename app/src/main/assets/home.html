@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Petal Start</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --accent-color: #f43f5e;
+            --accent-gradient: linear-gradient(135deg, #f43f5e 0%, #fb7185 50%, #e11d48 100%);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --search-bg: rgba(15, 23, 42, 0.6);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+            --radius-xl: 20px;
+            --radius-md: 12px;
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg-color: #f8fafc;
+                --card-bg: rgba(255, 255, 255, 0.85);
+                --card-border: rgba(226, 232, 240, 0.8);
+                --accent-color: #e11d48;
+                --text-primary: #0f172a;
+                --text-secondary: #64748b;
+                --search-bg: rgba(241, 245, 249, 0.9);
+                --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 24px 16px 40px;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(244, 63, 94, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(99, 102, 241, 0.12) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 680px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            align-items: center;
+        }
+
+        /* Header / Logo section */
+        .brand-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+            gap: 8px;
+        }
+
+        .logo-box {
+            width: 72px;
+            height: 72px;
+            border-radius: 20px;
+            background: var(--accent-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(244, 63, 94, 0.35);
+            margin-bottom: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-box:hover {
+            transform: scale(1.05) rotate(3deg);
+        }
+
+        .logo-box svg {
+            width: 42px;
+            height: 42px;
+            fill: #ffffff;
+        }
+
+        .app-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .greeting {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Search Section */
+        .search-card {
+            width: 100%;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-xl);
+            padding: 8px 12px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .search-engine-selector {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4px 8px 0;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .engine-select {
+            background: transparent;
+            border: none;
+            color: var(--accent-color);
+            font-weight: 600;
+            font-size: 0.85rem;
+            outline: none;
+            cursor: pointer;
+            padding-right: 4px;
+        }
+
+        .search-form {
+            display: flex;
+            align-items: center;
+            background: var(--search-bg);
+            border-radius: 14px;
+            padding: 6px 14px;
+            border: 1px solid transparent;
+            transition: all 0.25s ease;
+        }
+
+        .search-form:focus-within {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.2);
+        }
+
+        .search-icon {
+            width: 20px;
+            height: 20px;
+            fill: var(--text-secondary);
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        .search-input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            color: var(--text-primary);
+            font-size: 1rem;
+            padding: 10px 0;
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        .search-button {
+            background: var(--accent-gradient);
+            border: none;
+            color: white;
+            border-radius: 10px;
+            padding: 8px 14px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            margin-left: 8px;
+            flex-shrink: 0;
+        }
+
+        .search-button:active {
+            opacity: 0.85;
+        }
+
+        /* Quick Links Grid */
+        .section-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-secondary);
+            width: 100%;
+            padding-left: 6px;
+        }
+
+        .shortcuts-grid {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 480px) {
+            .shortcuts-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 12px;
+            }
+        }
+
+        .shortcut-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-primary);
+            gap: 8px;
+            transition: transform 0.2s ease;
+        }
+
+        .shortcut-item:hover {
+            transform: translateY(-4px);
+        }
+
+        .shortcut-icon {
+            width: 58px;
+            height: 58px;
+            border-radius: 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            font-size: 1.5rem;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
+        }
+
+        .shortcut-item:hover .shortcut-icon {
+            border-color: var(--accent-color);
+            box-shadow: 0 6px 16px rgba(244, 63, 94, 0.25);
+        }
+
+        .shortcut-icon img {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            object-fit: contain;
+        }
+
+        .shortcut-label {
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            text-align: center;
+            max-width: 72px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Stats & Privacy Dashboard */
+        .stats-card {
+            width: 100%;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-xl);
+            padding: 18px 20px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .stat-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 8px;
+            background: var(--search-bg);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--card-border);
+        }
+
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--accent-color);
+        }
+
+        .stat-label {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-top: 2px;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 12px;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            text-align: center;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Header Logo & Title -->
+    <div class="brand-header">
+        <div class="logo-box">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/>
+            </svg>
+        </div>
+        <h1 class="app-title">Petal</h1>
+        <div class="greeting" id="greeting-text">Fast • Private • Safe</div>
+    </div>
+
+    <!-- Search Bar Card -->
+    <div class="search-card">
+        <div class="search-engine-selector">
+            <span>Search Engine:</span>
+            <select class="engine-select" id="search-engine-select" onchange="savePreferredEngine(this.value)">
+                <option value="https://duckduckgo.com/?q=" selected>DuckDuckGo</option>
+                <option value="https://www.google.com/search?q=">Google</option>
+                <option value="https://startpage.com/do/search?query=">Startpage</option>
+                <option value="https://www.bing.com/search?q=">Bing</option>
+                <option value="https://www.ecosia.org/search?q=">Ecosia</option>
+            </select>
+        </div>
+
+        <form class="search-form" id="search-form" onsubmit="performSearch(event)">
+            <svg class="search-icon" viewBox="0 0 24 24">
+                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+            </svg>
+            <input type="text" class="search-input" id="search-input" placeholder="Search web or enter URL..." autocomplete="off" />
+            <button type="submit" class="search-button">Go</button>
+        </form>
+    </div>
+
+    <!-- Quick Shortcuts Grid -->
+    <div class="section-title">Speed Dial</div>
+    <div class="shortcuts-grid">
+        <a href="https://www.google.com" class="shortcut-item">
+            <div class="shortcut-icon"><img src="https://www.google.com/favicon.ico" alt="G" onerror="this.src='';this.parentNode.innerHTML='🔍';"></div>
+            <span class="shortcut-label">Google</span>
+        </a>
+        <a href="https://duckduckgo.com" class="shortcut-item">
+            <div class="shortcut-icon"><img src="https://duckduckgo.com/favicon.ico" alt="DDG" onerror="this.src='';this.parentNode.innerHTML='🦆';"></div>
+            <span class="shortcut-label">DuckDuckGo</span>
+        </a>
+        <a href="https://www.youtube.com" class="shortcut-item">
+            <div class="shortcut-icon"><img src="https://www.youtube.com/s/desktop/f78997a3/img/favicon.ico" alt="YT" onerror="this.src='';this.parentNode.innerHTML='▶️';"></div>
+            <span class="shortcut-label">YouTube</span>
+        </a>
+        <a href="https://www.wikipedia.org" class="shortcut-item">
+            <div class="shortcut-icon"><img src="https://www.wikipedia.org/static/favicon/wikipedia.ico" alt="W" onerror="this.src='';this.parentNode.innerHTML='🌐';"></div>
+            <span class="shortcut-label">Wikipedia</span>
+        </a>
+        <a href="https://github.com" class="shortcut-item">
+            <div class="shortcut-icon"><img src="https://github.githubassets.com/favicons/favicon.png" alt="GH" onerror="this.src='';this.parentNode.innerHTML='🐙';"></div>
+            <span class="shortcut-label">GitHub</span>
+        </a>
+        <a href="https://www.reddit.com" class="shortcut-item">
+            <div class="shortcut-icon"><img src="https://www.redditstatic.com/shreddit/assets/favicon/192x192.png" alt="R" onerror="this.src='';this.parentNode.innerHTML='🤖';"></div>
+            <span class="shortcut-label">Reddit</span>
+        </a>
+        <a href="https://news.google.com" class="shortcut-item">
+            <div class="shortcut-icon"><img src="https://ssl.gstatic.com/news-static/img/favicon/v2/favicon-96x96.png" alt="N" onerror="this.src='';this.parentNode.innerHTML='📰';"></div>
+            <span class="shortcut-label">News</span>
+        </a>
+        <a href="https://www.amazon.com" class="shortcut-item">
+            <div class="shortcut-icon"><img src="https://www.amazon.com/favicon.ico" alt="A" onerror="this.src='';this.parentNode.innerHTML='🛒';"></div>
+            <span class="shortcut-label">Amazon</span>
+        </a>
+    </div>
+
+    <!-- Privacy Summary Widget -->
+    <div class="stats-card">
+        <div class="section-title" style="padding-left:0;">Privacy Shield Active</div>
+        <div class="stats-grid">
+            <div class="stat-box">
+                <span class="stat-value">Active</span>
+                <span class="stat-label">Ad Blocker</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value">Protected</span>
+                <span class="stat-label">Anti-Tracking</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value">Enabled</span>
+                <span class="stat-label">HTTPS Security</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Petal Browser • Modern & Privacy Focused
+    </div>
+
+</div>
+
+<script>
+    // Load saved engine
+    const savedEngine = localStorage.getItem('petal_engine');
+    if (savedEngine) {
+        document.getElementById('search-engine-select').value = savedEngine;
+    }
+
+    function savePreferredEngine(val) {
+        localStorage.setItem('petal_engine', val);
+    }
+
+    function isUrl(str) {
+        if (!str) return false;
+        str = str.trim();
+        if (str.startsWith('http://') || str.startsWith('https://') || str.startsWith('file://')) return true;
+        const pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+            '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+            '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+            '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+            '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+            '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+        return !!pattern.test(str);
+    }
+
+    function performSearch(event) {
+        if (event) event.preventDefault();
+        const queryInput = document.getElementById('search-input');
+        const query = queryInput.value.trim();
+        if (!query) return;
+
+        if (isUrl(query)) {
+            let targetUrl = query;
+            if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://') && !targetUrl.startsWith('file://')) {
+                targetUrl = 'https://' + targetUrl;
+            }
+            window.location.href = targetUrl;
+        } else {
+            const engineUrl = document.getElementById('search-engine-select').value;
+            window.location.href = engineUrl + encodeURIComponent(query);
+        }
+    }
+</script>
+</body>
+</html>
