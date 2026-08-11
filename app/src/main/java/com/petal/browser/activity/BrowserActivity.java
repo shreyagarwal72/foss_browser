@@ -860,7 +860,8 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
         appBar.setOnClickListener(view -> {
             initSearch();
             sp.edit().putString("sp_search_customSearches", "").apply();
-            search_input.setText(ninjaWebView.getUrl());
+            String currentUrl = ninjaWebView != null ? ninjaWebView.getUrl() : "";
+            search_input.setText(currentUrl);
             dialogSearch.show();
             HelperUnit.showSoftKeyboard(search_input);
         });
@@ -868,18 +869,27 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
             ObjectAnimator animation = ObjectAnimator.ofFloat(appBar, "translationY", 275f);
             animation.setDuration(250);
             animation.start();
-            ObjectAnimator animation2 = ObjectAnimator.ofFloat(appBar_buttons, "translationY", 275f);
-            animation2.setDuration(250);
-            animation2.start();
+            if (appBar_buttons != null) {
+                ObjectAnimator animation2 = ObjectAnimator.ofFloat(appBar_buttons, "translationY", 275f);
+                animation2.setDuration(250);
+                animation2.start();
+            }
             return true;
         });
 
         fab_menu = findViewById(R.id.fab_menu);
-        fab_menu.setOnClickListener(view -> showOverflow(null, null, 0, ninjaWebView.getTitle(), ninjaWebView.getUrl(), null, null, 0));
-        fab_menu.setOnLongClickListener(view -> {
-            performGesture("setting_gesture_tabButton", ninjaWebView.getUrl());
-            return true;
-        });
+        if (fab_menu != null) {
+            fab_menu.setOnClickListener(view -> {
+                String title = ninjaWebView != null ? ninjaWebView.getTitle() : "";
+                String url = ninjaWebView != null ? ninjaWebView.getUrl() : "";
+                showOverflow(null, null, 0, title, url, null, null, 0);
+            });
+            fab_menu.setOnLongClickListener(view -> {
+                String url = ninjaWebView != null ? ninjaWebView.getUrl() : "";
+                performGesture("setting_gesture_tabButton", url);
+                return true;
+            });
+        }
         fab_overview = findViewById(R.id.fab_overview);
         list_search = dialogViewSearch.findViewById(R.id.list_search);
         progressBar = findViewById(R.id.main_progress_bar);
@@ -894,33 +904,55 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
         badgeDrawable.setBackgroundColor(color);
         badgeDrawable.setBadgeTextColor(color2);
 
-        fab_overview.setOnTouchListener(new SwipeTouchListener(context) {
-            public void onSwipeTop() {
-            performGesture("setting_gesture_tb_up", ninjaWebView.getUrl());
-            hideOverview(); }
-            public void onSwipeBottom() {
-                performGesture("setting_gesture_tb_down", ninjaWebView.getUrl());
-                hideOverview(); }
-            public void onSwipeRight() {
-                performGesture("setting_gesture_tb_right", ninjaWebView.getUrl());
-                hideOverview(); }
-            public void onSwipeLeft() {
-                performGesture("setting_gesture_tb_left", ninjaWebView.getUrl());
-                hideOverview(); }});
+        if (fab_overview != null) {
+            fab_overview.setOnTouchListener(new SwipeTouchListener(context) {
+                public void onSwipeTop() {
+                    String url = ninjaWebView != null ? ninjaWebView.getUrl() : "";
+                    performGesture("setting_gesture_tb_up", url);
+                    hideOverview();
+                }
+                public void onSwipeBottom() {
+                    String url = ninjaWebView != null ? ninjaWebView.getUrl() : "";
+                    performGesture("setting_gesture_tb_down", url);
+                    hideOverview();
+                }
+                public void onSwipeRight() {
+                    String url = ninjaWebView != null ? ninjaWebView.getUrl() : "";
+                    performGesture("setting_gesture_tb_right", url);
+                    hideOverview();
+                }
+                public void onSwipeLeft() {
+                    String url = ninjaWebView != null ? ninjaWebView.getUrl() : "";
+                    performGesture("setting_gesture_tb_left", url);
+                    hideOverview();
+                }
+            });
+        }
 
-        fab_menu.setOnTouchListener(new SwipeTouchListener(context) {
-            public void onSwipeTop() {
-                performGesture("setting_gesture_nav_up", ninjaWebView.getUrl());
-                hideOverflow(); }
-            public void onSwipeBottom() {
-                performGesture("setting_gesture_nav_down", ninjaWebView.getUrl());
-                hideOverflow();}
-            public void onSwipeRight() {
-                performGesture("setting_gesture_nav_right", ninjaWebView.getUrl());
-                hideOverflow();}
-            public void onSwipeLeft() {
-                performGesture("setting_gesture_nav_left", ninjaWebView.getUrl());
-                hideOverflow(); }});
+        if (fab_menu != null) {
+            fab_menu.setOnTouchListener(new SwipeTouchListener(context) {
+                public void onSwipeTop() {
+                    String url = ninjaWebView != null ? ninjaWebView.getUrl() : "";
+                    performGesture("setting_gesture_nav_up", url);
+                    hideOverflow();
+                }
+                public void onSwipeBottom() {
+                    String url = ninjaWebView != null ? ninjaWebView.getUrl() : "";
+                    performGesture("setting_gesture_nav_down", url);
+                    hideOverflow();
+                }
+                public void onSwipeRight() {
+                    String url = ninjaWebView != null ? ninjaWebView.getUrl() : "";
+                    performGesture("setting_gesture_nav_right", url);
+                    hideOverflow();
+                }
+                public void onSwipeLeft() {
+                    String url = ninjaWebView != null ? ninjaWebView.getUrl() : "";
+                    performGesture("setting_gesture_nav_left", url);
+                    hideOverflow();
+                }
+            });
+        }
 
         TextInputLayout search_textField  = dialogViewSearch.findViewById(R.id.search_textField);
 
