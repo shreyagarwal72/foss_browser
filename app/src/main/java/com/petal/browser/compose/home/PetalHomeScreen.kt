@@ -11,8 +11,10 @@ package com.petal.browser.compose.home
 import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.savedstate.ViewTreeSavedStateRegistryOwner
+import androidx.savedstate.findViewTreeSavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
