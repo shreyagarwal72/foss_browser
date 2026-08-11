@@ -845,15 +845,17 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
         LinearLayout appBar_buttons = findViewById(R.id.appBar_buttons);
 
         FloatingActionButton fab_showAppBar = findViewById(R.id.fab_showAppBar);
-        fab_showAppBar.setOnClickListener(v1 -> {
-            appBar.setVisibility(VISIBLE);
-            ObjectAnimator animationBack = ObjectAnimator.ofFloat(appBar, "translationY", 0f);
-            animationBack.setDuration(250);
-            animationBack.start();
-            ObjectAnimator animationBack2 = ObjectAnimator.ofFloat(appBar_buttons, "translationY", 0f);
-            animationBack2.setDuration(250);
-            animationBack2.start();
-        });
+        if (fab_showAppBar != null) {
+            fab_showAppBar.setOnClickListener(v1 -> {
+                appBar.setVisibility(VISIBLE);
+                ObjectAnimator animationBack = ObjectAnimator.ofFloat(appBar, "translationY", 0f);
+                animationBack.setDuration(250);
+                animationBack.start();
+                ObjectAnimator animationBack2 = ObjectAnimator.ofFloat(appBar_buttons, "translationY", 0f);
+                animationBack2.setDuration(250);
+                animationBack2.start();
+            });
+        }
 
         appBar.setOnClickListener(view -> {
             initSearch();

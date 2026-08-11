@@ -143,6 +143,25 @@
         android:layout_height="match_parent"
         android:layout_below="@id/main_progress_bar"/>
 
+    <!-- Floating Action Button for Showing Top Bar -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_showAppBar"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/icon_up"
+        app:elevation="2dp"
+        style="@style/Widget.Material3.Button.IconButton.Outlined"
+        app:backgroundTint="?attr/colorSurfaceContainerHighest"
+        app:borderWidth="0.5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        app:maxImageSize="20dp"
+        app:fabCustomSize="42dp"
+        android:visibility="gone"/>
+
     <!-- Search On Site Bar -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/searchOnSiteLayout"
