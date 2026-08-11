@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.RECORD_VIDEO" tools:ignore="SystemPermissionTypo" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
+    <application
+        android:allowBackup="true"
+        android:hardwareAccelerated="true"
+        android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher"
+        android:supportsRtl="true"
+        android:usesCleartextTraffic="false"
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
+
+        <!-- Zentraler Opt-Out für WebView-Metriken auf Anwendungsebene -->
+        <meta-data
+            android:name="android.webkit.WebView.MetricsOptOut"
+            android:value="true" />
+
+        <!--
+          Haupt-Browser-Activity
+          WICHTIG ab Android 12: windowSoftInputMode="adjustResize" ist der moderne Standard,
+          da "adjustPan" das Layout oft unkontrolliert verschiebt und Eingabefelder verdeckt.
+        -->
+        <activity
+            android:name="de.baumann.browser.activity.BrowserActivity"
+            android:configChanges="orientation|uiMode|screenSize|smallestScreenSize|screenLayout"
+            android:windowSoftInputMode="adjustResize"
+            android:fitsSystemWindows="false"
+            android:exported="true"
+            android:launchMode="singleTask">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Fängt jede Form von Text- und Code-Struktur ab (inkl. .txt, .html etc.) -->
+                <data android:mimeType="text/*" />
+                <!-- Sicherheitsnetz für Dateimanager, die JSON/XML als App-Typ statt Text deklarieren -->
+                <data android:mimeType="application/json" />
+                <data android:mimeType="application/xml" />
+            </intent-filter>
+
+            <!-- 2. FILTER: Fängt alle anderen Dateien (inkl. .org) ab, bei denen der Mime-Type unbekannt ist -->
+            <intent-filter tools:ignore="AppLinkUrlError">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <!-- Verpflichtend, damit Android die URI unabhängig vom Namen an die App übergibt -->
+                <data android:mimeType="*/*" />
+            </intent-filter>
+
+            <!-- Text über das Android 'Teilen'-Menü empfangen -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+
+            <!-- Launcher-Eintrag & Systemweite Websuche -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.WEB_SEARCH" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- Erlaubt es, markierten Text aus anderen Apps direkt im FOSS-Browser zu öffnen -->
+            <intent-filter>
+                <action android:name="android.intent.action.PROCESS_TEXT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+
+        </activity>
+
+        <!-- Hilfs-Activities für das Teilen von Inhalten -->
+        <activity
+            android:name=".activity.ActivityShare"
+            android:label="@string/dialog_postOnWebsite"
+            android:theme="@android:style/Theme.NoDisplay"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".activity.ActivityCustomSearches"
+            android:label="@string/custom_searches_title"
+            android:theme="@android:style/Theme.NoDisplay"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
+
+        <!--
+          Einstellungs-Activities:
+          WICHTIG ab Android 12+: Müssen explizit android:exported="false" deklariert werden,
+          da sie nur App-intern aufgerufen werden und sonst ein Sicherheitsrisiko darstellen!
+        -->
+        <activity android:name="de.baumann.browser.activity.Settings_Activity" android:label="@string/setting_title_browser" android:exported="false" />
+        <activity android:name="de.baumann.browser.activity.Settings_ProfileList" android:label="@string/setting_title_savedWebSites" android:exported="false" />
+        <activity android:name="de.baumann.browser.activity.Settings_Delete" android:label="@string/menu_delete" android:exported="false" />
+        <activity android:name="de.baumann.browser.activity.Settings_Backup" android:label="@string/setting_title_data" android:exported="false" />
+        <activity android:name="de.baumann.browser.activity.Settings_Gesture" android:label="@string/setting_gestures" android:exported="false" />
+        <activity android:name="de.baumann.browser.activity.Settings_Filter" android:label="@string/setting_filter" android:exported="false" />
+        <activity android:name="de.baumann.browser.activity.Settings_Profile" android:label="@string/setting_title_profiles_standard" android:exported="false" />
+        <activity android:name="de.baumann.browser.activity.Settings_Menu" android:label="@string/setting_menu" android:exported="false" />
+
+    </application>
+
+</manifest>

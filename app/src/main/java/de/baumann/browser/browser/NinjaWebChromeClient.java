@@ -1,0 +1,227 @@
+package de.baumann.browser.browser;
+
+import static android.content.ContentValues.TAG;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.util.Log;
+import android.view.View;
+import android.webkit.ConsoleMessage;
+import android.webkit.GeolocationPermissions;
+import android.webkit.JsPromptResult;
+import android.webkit.JsResult;
+import android.webkit.PermissionRequest;
+import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+
+import androidx.preference.PreferenceManager;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import de.baumann.browser.R;
+import de.baumann.browser.unit.BrowserUnit;
+import de.baumann.browser.unit.HelperUnit;
+import de.baumann.browser.view.NinjaToast;
+import de.baumann.browser.view.NinjaWebView;
+
+public class NinjaWebChromeClient extends WebChromeClient {
+
+    private final NinjaWebView ninjaWebView;
+
+    public NinjaWebChromeClient(NinjaWebView ninjaWebView) {
+        super();
+        this.ninjaWebView = ninjaWebView;
+    }
+
+    @Override
+    public boolean onJsAlert(WebView view, String url, String message, final JsResult result) {
+        new MaterialAlertDialogBuilder(ninjaWebView.getContext())
+                .setMessage(message)
+                .setCancelable(false)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> result.confirm())
+                .show();
+        return true;
+    }
+
+    @Override
+    public boolean onJsConfirm(WebView view, String url, String message, final JsResult result) {
+        new MaterialAlertDialogBuilder(ninjaWebView.getContext())
+                .setMessage(message)
+                .setCancelable(false)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> result.confirm())
+                .setNegativeButton(android.R.string.cancel, (dialog, which) -> result.cancel())
+                .show();
+        return true;
+    }
+
+    @Override
+    public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, final JsPromptResult result) {
+        final EditText input = new EditText(ninjaWebView.getContext());
+        input.setText(defaultValue);
+        FrameLayout container = new FrameLayout(ninjaWebView.getContext());
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT
+        );
+        int margin = (int) (20 * ninjaWebView.getContext().getResources().getDisplayMetrics().density);
+        params.leftMargin = margin;
+        params.rightMargin = margin;
+        input.setLayoutParams(params);
+        container.addView(input);
+
+        new MaterialAlertDialogBuilder(ninjaWebView.getContext())
+                .setTitle(message)
+                .setView(container)
+                .setCancelable(false)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> result.confirm(input.getText().toString()))
+                .setNegativeButton(android.R.string.cancel, (dialog, which) -> result.cancel())
+                .show();
+        return true;
+    }
+    @Override
+    public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+        if (consoleMessage.message().contains("NotAllowedError: Write permission denied.")) {  //this error occurs when user copies to clipboard
+            NinjaToast.show(ninjaWebView.getContext(), R.string.app_error_copy);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onProgressChanged(WebView view, int progress) {
+        super.onProgressChanged(view, progress);
+        String url = ninjaWebView.getUrl();
+        String title = ninjaWebView.getTitle();
+        ninjaWebView.updateTitle(progress);
+        assert title != null;
+        if (title.isEmpty()) ninjaWebView.updateTitle(HelperUnit.domain(url), url);
+        else ninjaWebView.updateTitle(title,url);
+    }
+    @Override
+    public boolean onCreateWindow(WebView view, boolean dialog, boolean userGesture, android.os.Message resultMsg) {
+        Context context = view.getContext();
+        NinjaWebView newWebView = new NinjaWebView(context);
+        view.addView(newWebView);
+        WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+        transport.setWebView(newWebView);
+        resultMsg.sendToTarget();
+        newWebView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                try {
+                    BrowserUnit.intentURL(context, request.getUrl());
+                } catch (Exception e) {
+                    Log.i(TAG, "shouldOverrideUrlLoading Exception:" + e);
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(request.getUrl().toString()));
+                    context.startActivity(Intent.createChooser(intent, request.getUrl().toString()));
+                }
+                return true;
+            }
+        });
+        return true;
+    }
+    @Override
+    public void onShowCustomView(View view, WebChromeClient.CustomViewCallback callback) {
+        NinjaWebView.getBrowserController().onShowCustomView(view, callback);
+        super.onShowCustomView(view, callback);
+    }
+    @Override
+    public void onHideCustomView() {
+        NinjaWebView.getBrowserController().onHideCustomView();
+        super.onHideCustomView();
+    }
+    @Override
+    public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, WebChromeClient.FileChooserParams fileChooserParams) {
+        NinjaWebView.getBrowserController().showFileChooser(filePathCallback);
+        return true;
+    }
+    @Override
+    public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
+        Activity activity = (Activity) ninjaWebView.getContext();
+        HelperUnit.grantPermissionsLoc(activity);
+        callback.invoke(origin, true, false);
+        super.onGeolocationPermissionsShowPrompt(origin, callback);
+    }
+    @Override
+    public void onPermissionRequest(final PermissionRequest request) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ninjaWebView.getContext());
+        Activity activity = (Activity) ninjaWebView.getContext();
+        String[] resources = request.getResources();
+        for (String resource : resources) {
+            if (PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(resource)) {
+                if (sp.getBoolean(NinjaWebView.getProfile() + "_camera", false)){
+                    HelperUnit.grantPermissionsCamera(activity);
+                    if (ninjaWebView.getSettings().getMediaPlaybackRequiresUserGesture())
+                        ninjaWebView.getSettings().setMediaPlaybackRequiresUserGesture(false);
+                    //fix conflict with save data option. Temporarily switch off setMediaPlaybackRequiresUserGesture
+                    ninjaWebView.reloadWithoutInit();
+                    request.grant(request.getResources());
+                }
+            } else if (PermissionRequest.RESOURCE_AUDIO_CAPTURE.equals(resource)) {
+                if (sp.getBoolean(NinjaWebView.getProfile() + "_microphone", false)){
+                    HelperUnit.grantPermissionsMic(activity);
+                    request.grant(request.getResources());
+                }
+            } else if (PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID.equals(resource)) {
+                if (sp.getBoolean(NinjaWebView.getProfile() + "_drm", true)){
+                    request.grant(request.getResources());
+                } else {
+                    HelperUnit.showCustomSnackbarWithTwoActions(
+                            ninjaWebView.getContext(), ninjaWebView, null,
+                            ninjaWebView.getContext().getString(R.string.app_warning), ninjaWebView.getContext().getString(R.string.hint_DRM_Media), ninjaWebView.getUrl(),
+                            R.drawable.icon_check, () -> {
+                                request.grant(request.getResources());
+                                return true;
+                            },
+                            R.drawable.icon_close, () -> {
+                                request.deny();
+                                return true;
+                            }
+                    );
+                }
+            }
+        }
+    }
+    @Override
+    public void onReceivedIcon(WebView view, Bitmap icon) {
+        String url = ninjaWebView.getUrl();
+        ImageView iv = ninjaWebView.getAlbumView().findViewById(R.id.item_icon);
+        if (url == null) {
+            iv.setImageResource(R.drawable.icon_image_broken);
+        } else if (url.equals("about:blank")) {
+            iv.setImageResource(R.drawable.icon_image_broken);
+        } else if (BrowserUnit.isURL(url)) {
+            ninjaWebView.setFavicon(icon);
+            ninjaWebView.updateFavicon(ninjaWebView.getUrl());
+        } else {
+            iv.setImageResource(R.drawable.icon_image_broken);
+        }
+        super.onReceivedIcon(view, icon);
+    }
+    @Override
+    public void onReceivedTitle(WebView view, String sTitle) {
+        super.onReceivedTitle(view, sTitle);
+        String url = ninjaWebView.getUrl();
+        ImageView iv = ninjaWebView.getAlbumView().findViewById(R.id.item_icon);
+        if (url == null) {
+            iv.setImageResource(R.drawable.icon_image_broken);
+        } else if (url.equals("about:blank")) {
+            iv.setImageResource(R.drawable.icon_image_broken);
+        } else if (BrowserUnit.isURL(url)) {
+            ninjaWebView.updateFavicon(ninjaWebView.getUrl());
+        } else {
+            iv.setImageResource(R.drawable.icon_image_broken);
+        }
+    }
+}

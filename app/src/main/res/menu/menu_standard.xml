@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_standardAlways"
+        android:title="@string/app_always"
+        android:icon="@drawable/icon_check" />
+    <item
+        android:id="@+id/menu_standardNever"
+        android:title="@string/app_never"
+        android:icon="@drawable/icon_close" />
+    <item
+        android:id="@+id/menu_standardRestart"
+        android:title="@string/app_restart"
+        android:icon="@drawable/icon_refresh" />
+</menu>

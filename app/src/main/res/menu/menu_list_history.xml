@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_help"
+        android:title="@string/app_help"
+        android:icon="@drawable/icon_help" />
+
+    <item
+        android:id="@+id/menu_delete"
+        android:title="@string/menu_delete"
+        android:icon="@drawable/icon_delete" />
+
+
+    <item android:title="@string/menu_sort"
+        android:icon="@drawable/icon_sort">
+        <menu>
+            <item
+                android:id="@+id/menu_sortDate"
+                android:title="@string/dialog_sortDate"
+                android:icon="@drawable/icon_history" />
+            <item
+                android:id="@+id/menu_sortDomain"
+                android:title="@string/dialog_sortDomain"
+                android:icon="@drawable/icon_web" />
+        </menu>
+    </item>
+
+</menu>

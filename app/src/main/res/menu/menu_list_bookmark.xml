@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_help"
+        android:title="@string/app_help"
+        android:icon="@drawable/icon_help" />
+
+    <item
+        android:id="@+id/menu_delete"
+        android:title="@string/menu_delete"
+        android:icon="@drawable/icon_delete"  />
+
+    <item android:title="@string/menu_sort"
+        android:icon="@drawable/icon_sort" >
+        <menu>
+            <item
+                android:id="@+id/menu_sortName"
+                android:title="@string/dialog_sortName"
+                android:icon="@drawable/icon_sort_name"  />
+            <item
+                android:id="@+id/menu_sortIcon"
+                android:title="@string/dialog_sortIcon"
+                android:icon="@drawable/icon_filter"  />
+            <item
+                android:id="@+id/menu_sortDomain"
+                android:title="@string/dialog_sortDomain"
+                android:icon="@drawable/icon_web" />
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/menu_filter"
+        android:title="@string/menu_filter"
+        android:icon="@drawable/icon_filter"/>
+
+</menu>
