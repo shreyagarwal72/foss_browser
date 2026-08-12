@@ -554,7 +554,8 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
 
                         @Override
                         public void onMenuClick() {
-                            showOverflow(null, null, 0, ninjaWebView != null ? ninjaWebView.getTitle() : "", ninjaWebView != null ? ninjaWebView.getUrl() : "", null, null, 0);
+                            View navView = findViewById(R.id.bottom_nav_compose);
+                            showOverflow(null, navView, 0, ninjaWebView != null ? ninjaWebView.getTitle() : "", ninjaWebView != null ? ninjaWebView.getUrl() : "", null, null, 0);
                         }
                     }
                 );
@@ -1507,17 +1508,45 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
             });
         }
 
-        View anchor = anchorView != null ? anchorView : findViewById(R.id.item_cardView);
-        if (anchor != null) {
-            int xOffset = -(popupWidth - anchor.getWidth());
-            popupWindow.showAsDropDown(anchor, xOffset, 0);
+        View anchor = anchorView;
+        if (anchor == null) {
+            anchor = findViewById(R.id.bottom_nav_compose);
+        }
+        if (anchor == null || anchor.getVisibility() != View.VISIBLE) {
+            anchor = findViewById(R.id.fab_menu);
+        }
+        if (anchor == null || anchor.getVisibility() != View.VISIBLE) {
+            anchor = findViewById(R.id.appBar_buttons);
+        }
+
+        android.util.DisplayMetrics dm = getResources().getDisplayMetrics();
+        int marginEnd = (int) (12 * dm.density);
+
+        if (anchor != null && anchor.getVisibility() == View.VISIBLE) {
+            int[] location = new int[2];
+            anchor.getLocationOnScreen(location);
+            int anchorY = location[1];
+            int screenHeight = dm.heightPixels;
+
+            boolean isBottomHalf = anchorY > (screenHeight / 2);
+
+            if (isBottomHalf) {
+                int marginBottom = screenHeight - anchorY + (int) (8 * dm.density);
+                if (marginBottom < (int) (60 * dm.density)) {
+                    marginBottom = (int) (80 * dm.density);
+                }
+                popupWindow.showAtLocation(getWindow().getDecorView(), android.view.Gravity.BOTTOM | android.view.Gravity.END, marginEnd, marginBottom);
+            } else {
+                int xOffset = -(popupWidth - anchor.getWidth());
+                popupWindow.showAsDropDown(anchor, xOffset, (int) (8 * dm.density));
+            }
         } else {
-            popupWindow.showAtLocation(getWindow().getDecorView(), android.view.Gravity.TOP | android.view.Gravity.END, 16, 120);
+            popupWindow.showAtLocation(getWindow().getDecorView(), android.view.Gravity.BOTTOM | android.view.Gravity.END, marginEnd, (int) (80 * dm.density));
         }
     }
 
     public void showOverflow(Dialog dialog, View view, int hideMenu, String title, String url, final AdapterRecord adapterRecord, List<Record> recordList, int location) {
-        showOverflowMenu(view != null ? view : findViewById(R.id.item_cardView));
+        showOverflowMenu(view != null ? view : findViewById(R.id.bottom_nav_compose));
     }
 
     public void showDialogFastToggle(String title, String url, FloatingActionButton floatingActionButton) {
