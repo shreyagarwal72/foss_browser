@@ -44,12 +44,20 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+fun interface HistoryUrlHandler {
+    fun open(url: String)
+}
+
+fun interface HistoryActionHandler {
+    fun action()
+}
+
 object PetalHistoryBridge {
     @JvmStatic
     fun showHistory(
         activity: ComponentActivity,
-        onOpenUrl: (String) -> Unit,
-        onClearBrowsingData: () -> Unit
+        onOpenUrl: HistoryUrlHandler,
+        onClearBrowsingData: HistoryActionHandler
     ) {
         try {
             val dialog = BottomSheetDialog(activity)
@@ -62,11 +70,11 @@ object PetalHistoryBridge {
                         PetalHistoryScreen(
                             onOpenUrl = { url ->
                                 try { dialog.dismiss() } catch (ignored: Exception) {}
-                                onOpenUrl(url)
+                                onOpenUrl.open(url)
                             },
                             onClearBrowsingData = {
                                 try { dialog.dismiss() } catch (ignored: Exception) {}
-                                onClearBrowsingData()
+                                onClearBrowsingData.action()
                             },
                             onDismiss = {
                                 try { dialog.dismiss() } catch (ignored: Exception) {}
