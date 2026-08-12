@@ -4,23 +4,25 @@
 
     <!-- Search engine -->
     <string-array name="setting_entries_search_engine">
+        <item>Google</item>
+        <item>DuckDuckGo</item>
         <item>Startpage</item>
-        <item>Startpage (de)</item>
-        <item>Duckduckgo</item>
-        <item>Searx</item>
+        <item>Brave Search</item>
+        <item>Bing</item>
+        <item>SearXNG</item>
         <item>Qwant</item>
         <item>Ecosia</item>
-        <item>Mojeek</item>
     </string-array>
 
     <string-array name="setting_values_search_engine">
         <item>0</item>
         <item>1</item>
+        <item>2</item>
+        <item>3</item>
         <item>4</item>
+        <item>5</item>
         <item>6</item>
         <item>7</item>
-        <item>8</item>
-        <item>10</item>
     </string-array>
 
     <!-- Gestures -->

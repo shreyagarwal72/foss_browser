@@ -33,6 +33,7 @@ import org.json.JSONException;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 
 import java.util.List;
 import java.util.Locale;
@@ -58,6 +59,11 @@ public class BrowserUnit {
         }
 
         urlString = urlString.trim();
+        // If string contains unencoded spaces, it's a search query, not a direct URL
+        if (urlString.contains(" ")) {
+            return false;
+        }
+
         try {
             URI uri = new URI(urlString);
 
@@ -65,7 +71,7 @@ public class BrowserUnit {
             if (uri.getScheme() != null) {
                 String scheme = uri.getScheme().toLowerCase();
                 // Erlaubt Web-Links sowie lokale Datei- und Inhalts-Pfade von Android
-                return "http".equals(scheme) || "https".equals(scheme) || "file".equals(scheme) || "content".equals(scheme);
+                return "http".equals(scheme) || "https".equals(scheme) || "file".equals(scheme) || "content".equals(scheme) || "about".equals(scheme);
             }
 
             // Fall 2: Die Eingabe hat kein Schema (z.B. "google.com")
@@ -82,14 +88,18 @@ public class BrowserUnit {
     }
 
     public static String queryWrapper(Context context, String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return "";
+        }
+        query = query.trim();
 
         if (query.contains(";jsessionid=")) {
             String tracking = query.substring(query.lastIndexOf(";"));
             query = query.replace(tracking, "");
         }
 
-        if (isURL(query) || query.isEmpty()) {
-            if (query.startsWith("about:blank") || query.startsWith("mailto:")) {
+        if (isURL(query)) {
+            if (query.startsWith("about:blank") || query.startsWith("mailto:") || query.startsWith("file:") || query.startsWith("content:")) {
                 return query;
             }
             if (!query.contains("://")) {
@@ -100,40 +110,43 @@ public class BrowserUnit {
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
             String customSearchEngine = sp.getString("sp_search_engine_custom", "");
             String customSearches = sp.getString("sp_search_customSearches", "");
-            query = query.replace("&", "%26");
-            query = query.replace("#", "");
-            //Override UserAgent if own UserAgent is defined
-            if (!sp.contains("searchEngineSwitch")) {
-                //if new switch_text_preference has never been used initialize the switch
-                if (customSearchEngine.isEmpty()) {
-                    sp.edit().putBoolean("searchEngineSwitch", false).apply();
-                } else {
-                    sp.edit().putBoolean("searchEngineSwitch", true).apply();
-                }
+            
+            String encodedQuery;
+            try {
+                encodedQuery = URLEncoder.encode(query, "UTF-8");
+            } catch (Exception e) {
+                encodedQuery = query.replace(" ", "+");
             }
 
             if (!customSearches.isEmpty()) {
-                return customSearches + query;
-            } else if (sp.getBoolean("searchEngineSwitch", false)) {
-                //if new switch_text_preference has never been used initialize the switch
-                return customSearchEngine + query;
+                return customSearches + encodedQuery;
+            } else if (sp.getBoolean("searchEngineSwitch", false) && !customSearchEngine.isEmpty()) {
+                return customSearchEngine + encodedQuery;
             } else {
-                final int i = Integer.parseInt(Objects.requireNonNull(sp.getString("sp_search_engine", "0")));
+                int i = 0;
+                try {
+                    i = Integer.parseInt(Objects.requireNonNull(sp.getString("sp_search_engine", "0")));
+                } catch (Exception ignored) {}
+
                 switch (i) {
                     case 0:
-                        return "https://startpage.com/do/search?query=" + query;
+                        return "https://www.google.com/search?q=" + encodedQuery;
                     case 1:
-                        return "https://startpage.com/do/search?lui=deu&language=deutsch&query=" + query;
+                        return "https://duckduckgo.com/?q=" + encodedQuery;
+                    case 2:
+                        return "https://startpage.com/do/search?query=" + encodedQuery;
+                    case 3:
+                        return "https://search.brave.com/search?q=" + encodedQuery;
                     case 4:
-                        return "https://duckduckgo.com/?q=" + query;
+                        return "https://www.bing.com/search?q=" + encodedQuery;
+                    case 5:
+                        return "https://searx.be/?q=" + encodedQuery;
                     case 6:
-                        return "https://searx.be/?q=" + query;
+                        return "https://www.qwant.com/?q=" + encodedQuery;
                     case 7:
-                        return "https://www.qwant.com/?q=" + query;
-                    case 8:
-                        return "https://www.ecosia.org/search?q=" + query;
+                        return "https://www.ecosia.org/search?q=" + encodedQuery;
                     default:
-                        return "https://www.mojeek.com/search?q=" + query;
+                        return "https://www.google.com/search?q=" + encodedQuery;
                 }
             }
         }

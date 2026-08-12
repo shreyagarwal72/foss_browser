@@ -32,6 +32,8 @@ import androidx.activity.ComponentActivity
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.petal.browser.ui.components.IconSwitch
+import com.petal.browser.ui.components.PetalSearchEngineSheet
+import com.petal.browser.ui.components.availableSearchEngines
 import com.petal.browser.ui.components.StrideSlider
 import com.petal.browser.ui.theme.PetalExpressiveTheme
 
@@ -63,6 +65,18 @@ fun PetalSettingsScreen(onBackPress: () -> Unit = {}) {
     var isJavaScript by remember { mutableStateOf(sp.getBoolean("sp_javascript", true)) }
     var fontSize by remember { mutableFloatStateOf(sp.getFloat("sp_font_size_scale", 1.0f)) }
     var zoomLevel by remember { mutableFloatStateOf(sp.getFloat("sp_zoom_level_scale", 1.0f)) }
+    var searchEngineIndex by remember { mutableStateOf(sp.getString("sp_search_engine", "0") ?: "0") }
+    var showEngineSheet by remember { mutableStateOf(false) }
+
+    if (showEngineSheet) {
+        PetalSearchEngineSheet(
+            onSelectEngine = { idx ->
+                searchEngineIndex = idx.toString()
+                showEngineSheet = false
+            },
+            onDismiss = { showEngineSheet = false }
+        )
+    }
 
     PetalExpressiveTheme(
         dynamicColor = isDynamicColor,
@@ -97,6 +111,44 @@ fun PetalSettingsScreen(onBackPress: () -> Unit = {}) {
                     .padding(horizontal = 20.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
+                // Search Engine Section
+                SettingsCategoryCard(title = "Default Search Engine", icon = Icons.Rounded.Search) {
+                    val currentEngineName = remember(searchEngineIndex) {
+                        val idx = searchEngineIndex.toIntOrNull() ?: 0
+                        availableSearchEngines.find { it.index == idx }?.name ?: "Google"
+                    }
+                    Surface(
+                        onClick = { showEngineSheet = true },
+                        shape = RoundedCornerShape(18.dp),
+                        color = MaterialTheme.colorScheme.surfaceContainer,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(14.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "Default Search Provider",
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Text(
+                                    text = currentEngineName,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                            Icon(
+                                Icons.Rounded.ChevronRight,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+
                 // 1. Appearance & Theme Section
                 SettingsCategoryCard(title = "Appearance & Theme", icon = Icons.Rounded.Palette) {
                     // AMOLED Black Toggle

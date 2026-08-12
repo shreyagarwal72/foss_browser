@@ -7,6 +7,7 @@
 
 package com.petal.browser.ui.components
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -21,13 +22,23 @@ import androidx.compose.material.icons.rounded.DeleteSweep
 import androidx.compose.material.icons.rounded.Public
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.setViewTreeLifecycleOwner
+import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.petal.browser.browser.AlbumController
+import com.petal.browser.browser.BrowserContainer
+import com.petal.browser.view.NinjaWebView
+import com.petal.browser.ui.theme.PetalExpressiveTheme
 
 data class TabModel(
     val id: Int,
@@ -35,6 +46,86 @@ data class TabModel(
     val url: String,
     val isActive: Boolean
 )
+
+object PetalTabSwitcherBridge {
+    @JvmStatic
+    fun showTabSwitcherSheet(
+        activity: ComponentActivity,
+        currentAlbum: AlbumController?,
+        onSelectTab: (AlbumController) -> Unit,
+        onCloseTab: (AlbumController) -> Unit,
+        onCloseAllTabs: () -> Unit,
+        onNewTab: () -> Unit
+    ) {
+        try {
+            val dialog = BottomSheetDialog(activity)
+            val composeView = ComposeView(activity).apply {
+                setViewTreeLifecycleOwner(activity)
+                setViewTreeSavedStateRegistryOwner(activity)
+                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+                setContent {
+                    PetalExpressiveTheme {
+                        val currentCount = BrowserContainer.size()
+                        val tabsList = remember(currentCount) {
+                            BrowserContainer.list().mapIndexed { index, album ->
+                                val webView = album as? NinjaWebView
+                                val rawTitle = webView?.title
+                                val rawUrl = webView?.url
+                                val displayTitle = when {
+                                    !rawTitle.isNullOrBlank() -> rawTitle
+                                    !rawUrl.isNullOrBlank() && !rawUrl.startsWith("file:///android_asset/") -> rawUrl
+                                    else -> "New Tab"
+                                }
+                                val displayUrl = rawUrl ?: "about:blank"
+                                TabModel(
+                                    id = index,
+                                    title = displayTitle,
+                                    url = displayUrl,
+                                    isActive = album == currentAlbum
+                                )
+                            }
+                        }
+
+                        PetalTabSwitcherSheet(
+                            tabs = tabsList,
+                            onSelectTab = { model ->
+                                try { dialog.dismiss() } catch (ignored: Exception) {}
+                                if (model.id >= 0 && model.id < BrowserContainer.size()) {
+                                    val album = BrowserContainer.get(model.id)
+                                    onSelectTab(album)
+                                }
+                            },
+                            onCloseTab = { model ->
+                                if (model.id >= 0 && model.id < BrowserContainer.size()) {
+                                    val album = BrowserContainer.get(model.id)
+                                    onCloseTab(album)
+                                }
+                                if (BrowserContainer.size() == 0) {
+                                    try { dialog.dismiss() } catch (ignored: Exception) {}
+                                }
+                            },
+                            onCloseAllTabs = {
+                                try { dialog.dismiss() } catch (ignored: Exception) {}
+                                onCloseAllTabs()
+                            },
+                            onNewTab = {
+                                try { dialog.dismiss() } catch (ignored: Exception) {}
+                                onNewTab()
+                            },
+                            onDismiss = {
+                                try { dialog.dismiss() } catch (ignored: Exception) {}
+                            }
+                        )
+                    }
+                }
+            }
+            dialog.setContentView(composeView)
+            dialog.show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,7 +166,7 @@ fun PetalTabSwitcherSheet(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "Tap to switch or swipe to close",
+                        text = "Tap to switch or close tabs",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -111,24 +202,47 @@ fun PetalTabSwitcherSheet(
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
 
             // Grid of Chrome Android Style Open Tab Cards
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(max = 420.dp)
-            ) {
-                itemsIndexed(tabs, key = { _, tab -> tab.id }) { index, tab ->
-                    TabCard(
-                        tab = tab,
-                        index = index,
-                        onSelect = {
-                            onSelectTab(tab)
-                            onDismiss()
-                        },
-                        onClose = { onCloseTab(tab) }
-                    )
+            if (tabs.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "No open tabs",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(Modifier.height(12.dp))
+                        Button(onClick = onNewTab) {
+                            Icon(Icons.Rounded.Add, contentDescription = null)
+                            Spacer(Modifier.width(8.dp))
+                            Text("Open New Tab")
+                        }
+                    }
+                }
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 440.dp)
+                ) {
+                    itemsIndexed(tabs, key = { _, tab -> tab.id }) { index, tab ->
+                        TabCard(
+                            tab = tab,
+                            index = index,
+                            onSelect = {
+                                onSelectTab(tab)
+                                onDismiss()
+                            },
+                            onClose = { onCloseTab(tab) }
+                        )
+                    }
                 }
             }
 

@@ -334,9 +334,14 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
             sp.edit().putBoolean("sp_welcome_shown", true).apply();
             try {
                 com.petal.browser.ui.components.PetalWelcomeBridge.showWelcomeDialog(this, () -> {
+                    if (!sp.getBoolean("sp_search_engine_chosen", false)) {
+                        com.petal.browser.ui.components.PetalSearchEngineBridge.showSearchEngineDialog(BrowserActivity.this, null);
+                    }
                     return kotlin.Unit.INSTANCE;
                 });
             } catch (Exception ignored) {}
+        } else if (!sp.getBoolean("sp_search_engine_chosen", false)) {
+            com.petal.browser.ui.components.PetalSearchEngineBridge.showSearchEngineDialog(this, null);
         }
     }
 
@@ -869,6 +874,16 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
             });
         }
 
+        View item_cardView = findViewById(R.id.item_cardView);
+        if (item_cardView != null) {
+            item_cardView.setOnClickListener(v -> {
+                String currentUrl = ninjaWebView != null ? ninjaWebView.getUrl() : "";
+                if (currentUrl != null && !currentUrl.isEmpty() && !currentUrl.startsWith("file:///android_asset/")) {
+                    showDialogFastToggle(HelperUnit.domain(currentUrl), currentUrl, item_cardView);
+                }
+            });
+        }
+
         appBar.setOnClickListener(view -> {
             initSearch();
             sp.edit().putString("sp_search_customSearches", "").apply();
@@ -1037,15 +1052,8 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
 
     @SuppressLint({"UnsafeOptInUsageError"})
     public void updateOmniBox() {
-        if (overViewTab.equals(getString(R.string.album_title_bookmarks))) {
-            try {
-                RecordAction action = new RecordAction(context);
-                action.open(true);
-                if (action.checkUrl(ninjaWebView.getUrl(), RecordUnit.TABLE_BOOKMARK)) fab_overview.setImageResource(R.drawable.icon_bookmark_added);
-                else fab_overview.setImageResource(R.drawable.icon_bookmark);
-                action.close();
-            }
-            catch (Exception e) {Log.i(TAG, "dialogCustomSearches:" + e);}
+        if (fab_overview != null) {
+            fab_overview.setImageResource(R.drawable.icon_tab);
         }
 
         try {
@@ -1071,8 +1079,15 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
                         String title = ninjaWebView.getTitle();
                         appBar_title.setText(title != null && !title.isEmpty() ? title : url);
                     }
-                    if (contentView != null) {
-                        FaviconHelper.setFavicon(context, contentView, url, R.id.menu_icon, R.drawable.icon_image_broken);
+                    ImageView menuIcon = findViewById(R.id.menu_icon);
+                    if (menuIcon != null) {
+                        if (url.startsWith("https://")) {
+                            menuIcon.setImageResource(R.drawable.icon_secure);
+                        } else if (url.startsWith("http://")) {
+                            menuIcon.setImageResource(R.drawable.icon_unsecure);
+                        } else {
+                            FaviconHelper.setFavicon(context, contentView, url, R.id.menu_icon, R.drawable.icon_secure);
+                        }
                     }
                     TextView overflowURL = findViewById(R.id.appbar_URL);
                     if (overflowURL != null) {
@@ -1136,8 +1151,31 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
     }
 
     private void showOverview() {
-        initOverview();
-        dialogOverview.show();
+        try {
+            com.petal.browser.ui.components.PetalTabSwitcherBridge.showTabSwitcherSheet(
+                this,
+                currentAlbumController,
+                album -> {
+                    showAlbum(album);
+                    return kotlin.Unit.INSTANCE;
+                },
+                album -> {
+                    removeAlbum(album);
+                    return kotlin.Unit.INSTANCE;
+                },
+                () -> {
+                    BrowserContainer.clear();
+                    addAlbum(getString(R.string.app_name), sp.getString("favoriteURL", "file:///android_asset/home.html"), true);
+                    return kotlin.Unit.INSTANCE;
+                },
+                () -> {
+                    addAlbum(getString(R.string.app_name), sp.getString("favoriteURL", "file:///android_asset/home.html"), true);
+                    return kotlin.Unit.INSTANCE;
+                }
+            );
+        } catch (Exception e) {
+            Log.e(TAG, "Error showing tabs overview", e);
+        }
     }
 
     public void hideSearch() {
