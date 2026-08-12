@@ -72,7 +72,8 @@ dependencies {
     implementation 'androidx.webkit:webkit:1.16.0'
     implementation 'com.google.code.gson:gson:2.11.0'
 
-    // AndroidX Lifecycle and SavedState Explicit Dependencies
+    // AndroidX Activity, Lifecycle, and SavedState Explicit KTX Dependencies
+    implementation 'androidx.activity:activity-ktx:1.9.3'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.7'
     implementation 'androidx.savedstate:savedstate-ktx:1.2.1'
 

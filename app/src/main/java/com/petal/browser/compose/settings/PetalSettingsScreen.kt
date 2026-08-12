@@ -28,14 +28,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.preference.PreferenceManager
+import androidx.activity.ComponentActivity
+import androidx.lifecycle.setViewTreeLifecycleOwner
+import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.petal.browser.ui.components.IconSwitch
 import com.petal.browser.ui.components.StrideSlider
 import com.petal.browser.ui.theme.PetalExpressiveTheme
 
 object PetalSettingsBridge {
     @JvmStatic
-    fun createSettingsView(context: Context, onBackPress: () -> Unit): ComposeView {
-        return ComposeView(context).apply {
+    fun createSettingsView(activity: ComponentActivity, onBackPress: () -> Unit): ComposeView {
+        return ComposeView(activity).apply {
+            setViewTreeLifecycleOwner(activity)
+            setViewTreeSavedStateRegistryOwner(activity)
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 PetalSettingsScreen(onBackPress = onBackPress)
