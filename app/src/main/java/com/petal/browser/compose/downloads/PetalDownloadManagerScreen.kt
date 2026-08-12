@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
@@ -32,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
-import com.petal.browser.ui.components.LinearRipplingWavyProgressIndicator
 import com.petal.browser.ui.theme.PetalExpressiveTheme
 
 data class DownloadItem(
@@ -190,11 +190,23 @@ private fun DownloadCardItem(item: DownloadItem, onOpenFile: () -> Unit) {
             }
 
             if (item.status == DownloadManager.STATUS_RUNNING) {
-                LinearRipplingWavyProgressIndicator(
-                    progress = item.progress,
-                    label = "Downloading…",
-                    height = 20.dp
+                val animatedProgress by animateFloatAsState(
+                    targetValue = item.progress ?: 0f,
+                    animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
+                    label = "Progress"
                 )
+                Column(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
+                    LinearWavyProgressIndicator(
+                        progress = { animatedProgress },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Downloading… ${(animatedProgress * 100).toInt()}%",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
         }
     }

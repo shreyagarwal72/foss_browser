@@ -103,7 +103,7 @@ fun PetalHistoryScreen(
     var showClearConfirm by remember { mutableStateOf(false) }
 
     // Load history records from SQLite database asynchronously
-    var rawHistory by remember { mutableStateOf<List<Record>>(emptyList()) }
+    var rawHistory by remember { mutableStateOf<List<Record>?>(null) }
     
     LaunchedEffect(Unit) {
         try {
@@ -113,16 +113,17 @@ fun PetalHistoryScreen(
             action.close()
             rawHistory = list.reversed()
         } catch (e: Exception) {
-            e.printStackTrace()
+            rawHistory = emptyList()
         }
     }
 
     val filteredHistory = remember(searchQuery, rawHistory) {
+        val historyList = rawHistory ?: emptyList()
         if (searchQuery.isBlank()) {
-            rawHistory
+            historyList
         } else {
             val query = searchQuery.trim().lowercase()
-            rawHistory.filter { record ->
+            historyList.filter { record ->
                 (record.title?.lowercase()?.contains(query) == true) ||
                 (record.url?.lowercase()?.contains(query) == true)
             }
@@ -275,7 +276,16 @@ fun PetalHistoryScreen(
             }
 
             // History Records List
-            if (filteredHistory.isEmpty()) {
+            if (rawHistory == null) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularWavyProgressIndicator(modifier = Modifier.size(28.dp))
+                }
+            } else if (filteredHistory.isEmpty()) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
