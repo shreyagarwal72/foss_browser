@@ -71,6 +71,7 @@ public class NinjaWebView extends WebView implements AlbumController {
     private Bitmap favicon;
     private static SharedPreferences sp;
     private boolean foreground;
+    public static BrowserController browserController = null;
     public interface OnScrollChangeListener {
         void onScrollDown();
         void onScrollUp();
