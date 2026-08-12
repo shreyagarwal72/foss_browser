@@ -2663,32 +2663,6 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
             return false;
         });
 
-        if (sp.getString("favoriteURL", "").contains("codeberg")) {
-            sp.edit().putString("favoriteURL", "file:///android_asset/home.html").apply();
-        }
-
-        if (Objects.requireNonNull(sp.getString("saved_menu", "no")).equals("no")) {
-            sp.edit().putString("saved_menu", "yes").apply();
-            HelperUnit.initAndLoadMenu(this);
-        }
-
-        if (Objects.requireNonNull(sp.getString("saved_key_ok", "no")).equals("no")) {
-            sp.edit().putString("saved_key_ok", "yes")
-                    .putString("setting_gesture_tb_up", "04")
-                    .putString("setting_gesture_tb_down", "05")
-                    .putString("setting_gesture_tb_left", "03")
-                    .putString("setting_gesture_tb_right", "02")
-                    .putString("setting_gesture_nav_up", "16")
-                    .putString("setting_gesture_nav_down", "10")
-                    .putString("setting_gesture_nav_left", "07")
-                    .putString("setting_gesture_nav_right", "06")
-                    .putString("setting_gesture_tabButton", "19")
-                    .putString("setting_gesture_overViewButton", "18")
-                    .putBoolean("sp_autofill", true)
-                    .apply();
-            ninjaWebView.setProfileDefaultValues();
-        }
-
         ninjaWebView.setBrowserController(this);
         ninjaWebView.setAlbumTitle(title, url);
 

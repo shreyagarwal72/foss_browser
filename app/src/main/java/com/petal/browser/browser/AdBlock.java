@@ -37,37 +37,19 @@ public class AdBlock {
 
 
     public AdBlock(Context context) {
-        File file = new File(context.getDir("filesdir", Context.MODE_PRIVATE) + "/" + FILE);
-        if (!file.exists()) {
-            //copy hosts.txt from assets if not available
-            Log.d("Hosts file", "does not exist");
-            try {
-                AssetManager manager = context.getAssets();
-                copyFile(manager.open(FILE), Files.newOutputStream(file.toPath()));
-                downloadHosts(context);  //try to update hosts.txt from internet
-            } catch (IOException e) {
-                Log.e("browser", "Failed to copy asset file", e);
-            }
-        }
-
-        Calendar time = Calendar.getInstance();
-
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        if (sp.getBoolean("sp_savedata", false)) {
-            time.add(Calendar.DAY_OF_YEAR, -7);
-        } else {
-            time.add(Calendar.DAY_OF_YEAR, -1);
-        }
-
-        Date lastModified = new Date(file.lastModified());
-        if (lastModified.before(time.getTime()) || getHostsDate(context).isEmpty()) {
-            //also download again if something is wrong with the file
-            //update if file is older than a day
-            downloadHosts(context);
-        }
-
         if (hosts.isEmpty()) {
-            loadHosts(context);
+            new Thread(() -> {
+                try {
+                    File file = new File(context.getDir("filesdir", Context.MODE_PRIVATE) + "/" + FILE);
+                    if (!file.exists()) {
+                        AssetManager manager = context.getAssets();
+                        copyFile(manager.open(FILE), Files.newOutputStream(file.toPath()));
+                    }
+                    loadHosts(context);
+                } catch (Exception e) {
+                    Log.e("AdBlock", "Error loading hosts asynchronously", e);
+                }
+            }).start();
         }
     }
 
