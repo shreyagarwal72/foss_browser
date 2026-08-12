@@ -678,49 +678,59 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
 
     @SuppressLint("ClickableViewAccessibility")
     private void initOverview() {
+        if (dialogOverview == null) return;
         listView = dialogOverview.findViewById(R.id.list_overView);
         AtomicInteger intPage = new AtomicInteger();
 
-        TypedValue typedValue = new TypedValue();
-        context.getTheme().resolveAttribute(R.attr.colorPrimaryInverse, typedValue, true);
-        int color = typedValue.data;
-        TypedValue typedValue2 = new TypedValue();
-        context.getTheme().resolveAttribute(R.attr.colorOnSurface, typedValue2, true);
-        int color2 = typedValue2.data;
+        try {
+            TypedValue typedValue = new TypedValue();
+            context.getTheme().resolveAttribute(R.attr.colorPrimaryInverse, typedValue, true);
+            int color = typedValue.data;
+            TypedValue typedValue2 = new TypedValue();
+            context.getTheme().resolveAttribute(R.attr.colorOnSurface, typedValue2, true);
+            int color2 = typedValue2.data;
 
-        bottom_navigation.getOrCreateBadge(R.id.page_0).setBackgroundColor(color);
-        bottom_navigation.getOrCreateBadge(R.id.page_0).setBadgeTextColor(color2);
-        bottom_navigation.getOrCreateBadge(R.id.page_0).setHorizontalOffset(0);
-        bottom_navigation.getOrCreateBadge(R.id.page_0).setVerticalOffset(0);
-
-        if (BrowserContainer.size() > 1) {
-            bottom_navigation.getOrCreateBadge(R.id.page_0).setNumber(BrowserContainer.size());
-        }
+            if (bottom_navigation != null) {
+                BadgeDrawable badge = bottom_navigation.getOrCreateBadge(R.id.page_0);
+                if (badge != null) {
+                    badge.setBackgroundColor(color);
+                    badge.setBadgeTextColor(color2);
+                    badge.setHorizontalOffset(0);
+                    badge.setVerticalOffset(0);
+                    if (BrowserContainer.size() > 1) {
+                        badge.setNumber(BrowserContainer.size());
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
 
         NavigationBarView.OnItemSelectedListener navListener = menuItem -> {
 
             if (menuItem.getItemId() == R.id.page_0) {
-                fab_overview.setImageResource(R.drawable.icon_tab);
+                if (fab_overview != null) fab_overview.setImageResource(R.drawable.icon_tab);
                 overViewTab = getString(R.string.album_title_tab);
                 intPage.set(R.id.page_0);
-                listView.setVisibility(GONE);
-                tab_container.setVisibility(VISIBLE);}
+                if (listView != null) listView.setVisibility(GONE);
+                if (tab_container != null) tab_container.setVisibility(VISIBLE);}
 
             else if (menuItem.getItemId() == R.id.page_2) {
                 try {
                     RecordAction action = new RecordAction(context);
                     action.open(true);
-                    if (action.checkUrl(ninjaWebView.getUrl(), RecordUnit.TABLE_BOOKMARK)) {
-                        fab_overview.setImageResource(R.drawable.icon_bookmark_added);
-                    } else {
-                        fab_overview.setImageResource(R.drawable.icon_bookmark);
+                    String currentUrl = ninjaWebView != null ? ninjaWebView.getUrl() : "";
+                    if (fab_overview != null) {
+                        if (currentUrl != null && !currentUrl.isEmpty() && action.checkUrl(currentUrl, RecordUnit.TABLE_BOOKMARK)) {
+                            fab_overview.setImageResource(R.drawable.icon_bookmark_added);
+                        } else {
+                            fab_overview.setImageResource(R.drawable.icon_bookmark);
+                        }
                     }
                     action.close();
                 } catch (Exception e) {Log.i(TAG, "dialogCustomSearches:" + e);}
                 overViewTab = getString(R.string.album_title_bookmarks);
                 intPage.set(R.id.page_2);
-                listView.setVisibility(VISIBLE);
-                tab_container.setVisibility(GONE);
+                if (listView != null) listView.setVisibility(VISIBLE);
+                if (tab_container != null) tab_container.setVisibility(GONE);
 
                 RecordAction action = new RecordAction(context);
                 action.open(false);
@@ -728,17 +738,20 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
                 list = action.listBookmark(activity, filter, filterBy);
                 action.close();
                 adapter = new AdapterRecord(context, list);
-                listView.setAdapter(adapter);
-                adapter.notifyDataSetChanged();
-                filter = false;
-                listView.setOnItemClickListener((parent, view, position, id) -> {
-                    ninjaWebView.loadUrl(list.get(position).getURL());
-                    hideOverview();
-                });
-                listView.setOnItemLongClickListener((parent, view, position, id) -> {
-                    showOverflow(dialogOverview,  listView, 3, list.get(position).getTitle(), list.get(position).getURL(), adapter, list, position);
-                    return true;
-                }); }
+                if (listView != null) {
+                    listView.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
+                    filter = false;
+                    listView.setOnItemClickListener((parent, view, position, id) -> {
+                        if (ninjaWebView != null) ninjaWebView.loadUrl(list.get(position).getURL());
+                        else addAlbum(getString(R.string.app_name), list.get(position).getURL(), true);
+                        hideOverview();
+                    });
+                    listView.setOnItemLongClickListener((parent, view, position, id) -> {
+                        showOverflow(dialogOverview, listView, 3, list.get(position).getTitle(), list.get(position).getURL(), adapter, list, position);
+                        return true;
+                    });
+                } }
             else if (menuItem.getItemId() == R.id.page_3) {
                 fab_overview.setImageResource(R.drawable.icon_history);
                 overViewTab = getString(R.string.album_title_history);
