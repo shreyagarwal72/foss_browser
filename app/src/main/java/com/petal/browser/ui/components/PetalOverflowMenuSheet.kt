@@ -3,12 +3,11 @@
  * ─────────────────────────────────────────────────────────────────────────
  * Material 3 Expressive Options Menu Sheet with 28dp rounded container corners,
  * dark surface container background, spring-animated top icon row, dividers,
- * expandable More Tools section, and full interop bridge for Petal Browser.
+ * expandable More Tools section, and zero-jank high performance.
  */
 
 package com.petal.browser.ui.components
 
-import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -30,7 +29,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -156,9 +154,6 @@ object PetalOverflowBridge {
                             onOpenSettings = {
                                 dialog.dismiss()
                                 handler.onOpenSettings()
-                            },
-                            onDismiss = {
-                                try { dialog.dismiss() } catch (ignored: Exception) {}
                             }
                         )
                     }
@@ -172,7 +167,6 @@ object PetalOverflowBridge {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PetalOverflowMenuSheet(
     pageTitle: String,
@@ -196,28 +190,32 @@ fun PetalOverflowMenuSheet(
     onSavePage: () -> Unit,
     onShareLink: () -> Unit,
     onViewSource: () -> Unit,
-    onOpenSettings: () -> Unit,
-    onDismiss: () -> Unit
+    onOpenSettings: () -> Unit
 ) {
     var isMoreToolsExpanded by remember { mutableStateOf(false) }
 
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
+    Surface(
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-        dragHandle = {
-            BottomSheetDefaults.DragHandle(
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
-            )
-        }
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        modifier = Modifier.fillMaxWidth()
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 4.dp)
+                .padding(horizontal = 20.dp, vertical = 12.dp)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            // Drag Handle Indicator
+            Box(
+                modifier = Modifier
+                    .width(36.dp)
+                    .height(4.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f))
+                    .align(Alignment.CenterHorizontally)
+            )
+
             // Header Page Info Card
             Surface(
                 shape = RoundedCornerShape(20.dp),
@@ -225,21 +223,21 @@ fun PetalOverflowMenuSheet(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
-                    modifier = Modifier.padding(14.dp),
+                    modifier = Modifier.padding(12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Surface(
                         shape = CircleShape,
                         color = MaterialTheme.colorScheme.primaryContainer,
-                        modifier = Modifier.size(38.dp)
+                        modifier = Modifier.size(36.dp)
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Icon(
                                 if (pageUrl.startsWith("https://")) Icons.Rounded.Lock else Icons.Rounded.Public,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(18.dp)
                             )
                         }
                     }
@@ -262,43 +260,34 @@ fun PetalOverflowMenuSheet(
                 }
             }
 
-            // Top Icon Row (5 circular icon buttons, evenly spaced) with spring press feedback
+            // Top Icon Row (5 circular icon buttons) with spring press feedback
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // 1. Forward Button
                 CircularIconButton(
                     icon = Icons.Rounded.ArrowForward,
                     contentDescription = "Forward",
                     enabled = canGoForward,
                     onClick = onGoForward
                 )
-
-                // 2. Bookmark Toggle Button (star filled/outline)
                 CircularIconButton(
                     icon = if (isBookmarked) Icons.Rounded.Star else Icons.Rounded.StarBorder,
                     contentDescription = "Toggle Bookmark",
                     tint = if (isBookmarked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                     onClick = onToggleBookmark
                 )
-
-                // 3. Downloads Shortcut Button
                 CircularIconButton(
                     icon = Icons.Rounded.Downloading,
                     contentDescription = "Downloads",
                     onClick = onOpenDownloadsShortcut
                 )
-
-                // 4. Page Info Button
                 CircularIconButton(
                     icon = Icons.Rounded.Shield,
                     contentDescription = "Page Info",
                     onClick = onOpenPageInfo
                 )
-
-                // 5. Reload Button
                 CircularIconButton(
                     icon = Icons.Rounded.Refresh,
                     contentDescription = "Reload",
@@ -306,7 +295,7 @@ fun PetalOverflowMenuSheet(
                 )
             }
 
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
 
             // Section 1: New Tab & New Private Tab
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -323,7 +312,7 @@ fun PetalOverflowMenuSheet(
                 )
             }
 
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
 
             // Section 2: History & Delete browsing data
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -339,7 +328,7 @@ fun PetalOverflowMenuSheet(
                 )
             }
 
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
 
             // Section 3: Downloads, Bookmarks, Bookmark all tabs
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -360,11 +349,10 @@ fun PetalOverflowMenuSheet(
                 )
             }
 
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
 
             // Section 4: Expandable More tools, View source, Settings
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                // More tools expandable item
                 MenuRowItem(
                     icon = Icons.Rounded.Build,
                     title = "More tools",
@@ -418,7 +406,7 @@ fun PetalOverflowMenuSheet(
                 )
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(16.dp))
         }
     }
 }
@@ -436,11 +424,11 @@ private fun CircularIconButton(
         color = MaterialTheme.colorScheme.surfaceContainer,
         contentColor = if (enabled) tint else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
         modifier = Modifier
-            .size(52.dp)
+            .size(48.dp)
             .bouncyClickable(scaleDown = 0.84f, enabled = enabled, onClick = onClick)
     ) {
         Box(contentAlignment = Alignment.Center) {
-            Icon(icon, contentDescription = contentDescription, modifier = Modifier.size(24.dp))
+            Icon(icon, contentDescription = contentDescription, modifier = Modifier.size(22.dp))
         }
     }
 }
@@ -458,25 +446,25 @@ private fun MenuRowItem(
         color = MaterialTheme.colorScheme.surfaceContainer,
         modifier = Modifier
             .fillMaxWidth()
-            .bouncyClickable(scaleDown = 0.95f, onClick = onClick)
+            .bouncyClickable(scaleDown = 0.96f, onClick = onClick)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(14.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.weight(1f)
             ) {
                 Icon(
                     icon,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(22.dp)
+                    modifier = Modifier.size(20.dp)
                 )
                 Column {
                     Text(
@@ -499,7 +487,7 @@ private fun MenuRowItem(
                     trailingIcon,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(18.dp)
                 )
             }
         }
