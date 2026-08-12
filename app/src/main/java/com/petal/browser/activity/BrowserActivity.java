@@ -883,6 +883,11 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
             });
         }
 
+        View fab_bubble = findViewById(R.id.fab_bubble);
+        if (fab_bubble != null) {
+            fab_bubble.setOnClickListener(v -> animateAddressBarCollapse(false));
+        }
+
         appBar.setOnClickListener(view -> {
             initSearch();
             sp.edit().putString("sp_search_customSearches", "").apply();
@@ -1049,6 +1054,89 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
         }
     }
 
+    private boolean isHomePage(String url) {
+        if (url == null || url.isEmpty() || url.equals("about:blank")) return true;
+        return url.startsWith("file:///android_asset/");
+    }
+
+    private boolean isAddressBarCollapsed = false;
+
+    public void animateAddressBarCollapse(boolean collapse) {
+        String currentUrl = ninjaWebView != null ? ninjaWebView.getUrl() : "";
+        View fab_bubble = findViewById(R.id.fab_bubble);
+
+        if (isHomePage(currentUrl)) {
+            if (appBar != null) appBar.setVisibility(GONE);
+            LinearLayout appBar_buttons = findViewById(R.id.appBar_buttons);
+            if (appBar_buttons != null) appBar_buttons.setVisibility(GONE);
+            if (fab_bubble != null) fab_bubble.setVisibility(GONE);
+            isAddressBarCollapsed = false;
+            return;
+        }
+
+        if (appBar == null) return;
+        LinearLayout appBar_buttons = findViewById(R.id.appBar_buttons);
+
+        if (collapse && !isAddressBarCollapsed) {
+            isAddressBarCollapsed = true;
+            float targetY = -(appBar.getHeight() + HelperUnit.convertDpToPixel(40f, context));
+
+            ObjectAnimator anim1 = ObjectAnimator.ofFloat(appBar, "translationY", targetY);
+            anim1.setDuration(280);
+            anim1.setInterpolator(new android.view.animation.AccelerateInterpolator(1.2f));
+            anim1.start();
+
+            if (appBar_buttons != null) {
+                ObjectAnimator anim2 = ObjectAnimator.ofFloat(appBar_buttons, "translationY", targetY);
+                anim2.setDuration(280);
+                anim2.setInterpolator(new android.view.animation.AccelerateInterpolator(1.2f));
+                anim2.start();
+            }
+
+            if (fab_bubble != null) {
+                fab_bubble.setVisibility(VISIBLE);
+                fab_bubble.setScaleX(0f);
+                fab_bubble.setScaleY(0f);
+                fab_bubble.setAlpha(0f);
+                fab_bubble.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .alpha(1f)
+                        .setDuration(260)
+                        .setInterpolator(new android.view.animation.OvershootInterpolator(1.4f))
+                        .start();
+            }
+
+        } else if (!collapse && isAddressBarCollapsed) {
+            isAddressBarCollapsed = false;
+
+            appBar.setVisibility(VISIBLE);
+            if (appBar_buttons != null) appBar_buttons.setVisibility(VISIBLE);
+
+            ObjectAnimator anim1 = ObjectAnimator.ofFloat(appBar, "translationY", 0f);
+            anim1.setDuration(300);
+            anim1.setInterpolator(new android.view.animation.OvershootInterpolator(1.1f));
+            anim1.start();
+
+            if (appBar_buttons != null) {
+                ObjectAnimator anim2 = ObjectAnimator.ofFloat(appBar_buttons, "translationY", 0f);
+                anim2.setDuration(300);
+                anim2.setInterpolator(new android.view.animation.OvershootInterpolator(1.1f));
+                anim2.start();
+            }
+
+            if (fab_bubble != null) {
+                fab_bubble.animate()
+                        .scaleX(0f)
+                        .scaleY(0f)
+                        .alpha(0f)
+                        .setDuration(200)
+                        .withEndAction(() -> fab_bubble.setVisibility(GONE))
+                        .start();
+            }
+        }
+    }
+
     @SuppressLint({"UnsafeOptInUsageError"})
     public void updateOmniBox() {
         if (fab_overview != null) {
@@ -1069,6 +1157,28 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
         if (currentAlbumController instanceof NinjaWebView) {
             ninjaWebView = (NinjaWebView) currentAlbumController;
             String url = ninjaWebView.getUrl();
+            
+            // Homepage Gating check
+            View fab_bubble = findViewById(R.id.fab_bubble);
+            LinearLayout appBar_buttons = findViewById(R.id.appBar_buttons);
+            if (isHomePage(url)) {
+                if (appBar != null) appBar.setVisibility(GONE);
+                if (appBar_buttons != null) appBar_buttons.setVisibility(GONE);
+                if (fab_bubble != null) fab_bubble.setVisibility(GONE);
+                isAddressBarCollapsed = false;
+            } else {
+                if (appBar != null) {
+                    appBar.setVisibility(VISIBLE);
+                    appBar.setTranslationY(0f);
+                }
+                if (appBar_buttons != null) {
+                    appBar_buttons.setVisibility(VISIBLE);
+                    appBar_buttons.setTranslationY(0f);
+                }
+                if (fab_bubble != null) fab_bubble.setVisibility(GONE);
+                isAddressBarCollapsed = false;
+            }
+
             if (url != null) {
                 ninjaWebView.initPreferences(url);
                 if (ninjaWebView.isForeground()) {
@@ -2575,24 +2685,16 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
     @SuppressLint("ClickableViewAccessibility")
     private void setWebView(String title, final String url, final boolean foreground) {
         ninjaWebView = new NinjaWebView(context);
-        ninjaWebView.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
-            final Handler handler = new Handler();
-            handler.postDelayed(() -> {
-                if (scrollY > ninjaWebView.getScrollY()){
-                    ObjectAnimator animation = ObjectAnimator.ofFloat(appBar, "translationY", 0f);
-                    animation.setDuration(250);
-                    animation.start();
-                    LinearLayout appBarButtons = findViewById(R.id.appBar_buttons);
-                    ObjectAnimator animationBack = ObjectAnimator.ofFloat(appBarButtons, "translationY", 0f);
-                    animationBack.setDuration(250);
-                    animationBack.start();
-                } else if (scrollY < ninjaWebView.getScrollY()) {
-                    ObjectAnimator animation = ObjectAnimator.ofFloat(appBar, "translationY", 275f);
-                    animation.setDuration(250);
-                    animation.start();
-                }
-                Log.d("Handler", "Running Handler");
-            }, 50);
+        ninjaWebView.setOnScrollChangeListener(new NinjaWebView.OnScrollChangeListener() {
+            @Override
+            public void onScrollDown() {
+                runOnUiThread(() -> animateAddressBarCollapse(true));
+            }
+
+            @Override
+            public void onScrollUp() {
+                runOnUiThread(() -> animateAddressBarCollapse(false));
+            }
         });
 
         ninjaWebView.setOnLongClickListener(v -> {
