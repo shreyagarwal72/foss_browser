@@ -28,6 +28,8 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.widget.PopupWindow;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -877,10 +879,7 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
         View item_cardView = findViewById(R.id.item_cardView);
         if (item_cardView != null) {
             item_cardView.setOnClickListener(v -> {
-                String currentUrl = ninjaWebView != null ? ninjaWebView.getUrl() : "";
-                if (currentUrl != null && !currentUrl.isEmpty() && !currentUrl.startsWith("file:///android_asset/") && fab_menu != null) {
-                    showDialogFastToggle(HelperUnit.domain(currentUrl), currentUrl, fab_menu);
-                }
+                showOverflowMenu(v);
             });
         }
 
@@ -1232,163 +1231,179 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
         }
     }
 
-    public void showOverflow(Dialog dialog, View view, int hideMenu, String title, String url, final AdapterRecord adapterRecord, List<Record> recordList, int location) {
-        String finalTitle = title != null && !title.isEmpty() ? title : (ninjaWebView != null ? ninjaWebView.getTitle() : "New Tab");
-        String finalUrl = url != null && !url.isEmpty() ? url : (ninjaWebView != null ? ninjaWebView.getUrl() : "about:blank");
+    public void showOverflowMenu(View anchorView) {
+        View customView = LayoutInflater.from(this).inflate(R.layout.popup_overflow_menu, null);
+        int popupWidth = (int) (270 * getResources().getDisplayMetrics().density);
+        PopupWindow popupWindow = new PopupWindow(customView, popupWidth, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+        popupWindow.setElevation(16f);
+        popupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-        boolean canGoForward = ninjaWebView != null && ninjaWebView.canGoForward();
-        boolean isBookmarked = false;
-        try {
-            RecordAction action = new RecordAction(context);
-            action.open(true);
-            if (finalUrl != null && action.checkUrl(finalUrl, RecordUnit.TABLE_BOOKMARK)) {
-                isBookmarked = true;
-            }
-            action.close();
-        } catch (Exception ignored) {}
+        WindowManager.LayoutParams lp = getWindow().getAttributes();
+        lp.alpha = 0.6f;
+        getWindow().setAttributes(lp);
 
-        try {
-            com.petal.browser.ui.components.PetalOverflowBridge.showOverflowMenu(
-                this,
-                finalTitle,
-                finalUrl,
-                isBookmarked,
-                canGoForward,
-                new com.petal.browser.ui.components.PetalOverflowMenuActionHandler() {
-                    @Override
-                    public void onGoForward() {
-                        if (ninjaWebView != null && ninjaWebView.canGoForward()) {
-                            ninjaWebView.goForward();
-                        }
-                    }
+        popupWindow.setOnDismissListener(() -> {
+            WindowManager.LayoutParams p = getWindow().getAttributes();
+            p.alpha = 1.0f;
+            getWindow().setAttributes(p);
+        });
 
-                    @Override
-                    public void onToggleBookmark() {
-                        saveBookmark(finalTitle, finalUrl);
-                    }
+        // Top Row Actions
+        View btnForward = customView.findViewById(R.id.menu_forward);
+        if (btnForward != null) {
+            btnForward.setOnClickListener(v -> {
+                popupWindow.dismiss();
+                if (ninjaWebView != null && ninjaWebView.canGoForward()) {
+                    ninjaWebView.goForward();
+                }
+            });
+        }
+        View btnBookmark = customView.findViewById(R.id.menu_bookmark);
+        if (btnBookmark != null) {
+            btnBookmark.setOnClickListener(v -> {
+                popupWindow.dismiss();
+                if (ninjaWebView != null) {
+                    saveBookmark(ninjaWebView.getTitle(), ninjaWebView.getUrl());
+                }
+            });
+        }
+        View btnDownloadShortcut = customView.findViewById(R.id.menu_downloads_shortcut);
+        if (btnDownloadShortcut != null) {
+            btnDownloadShortcut.setOnClickListener(v -> {
+                popupWindow.dismiss();
+                startActivity(Intent.createChooser(new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS), null));
+            });
+        }
+        View btnPageInfo = customView.findViewById(R.id.menu_page_info);
+        if (btnPageInfo != null) {
+            btnPageInfo.setOnClickListener(v -> {
+                popupWindow.dismiss();
+                if (ninjaWebView != null && fab_menu != null) {
+                    showDialogFastToggle(HelperUnit.domain(ninjaWebView.getUrl()), ninjaWebView.getUrl(), fab_menu);
+                }
+            });
+        }
+        View btnReload = customView.findViewById(R.id.menu_reload);
+        if (btnReload != null) {
+            btnReload.setOnClickListener(v -> {
+                popupWindow.dismiss();
+                if (ninjaWebView != null) {
+                    ninjaWebView.reload();
+                }
+            });
+        }
 
-                    @Override
-                    public void onOpenDownloadsShortcut() {
-                        startActivity(Intent.createChooser(new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS), null));
-                    }
-
-                    @Override
-                    public void onOpenPageInfo() {
-                        if (fab_menu != null) {
-                            showDialogFastToggle(HelperUnit.domain(finalUrl), finalUrl, fab_menu);
-                        }
-                    }
-
-                    @Override
-                    public void onReload() {
+        // List Actions
+        View btnNewTab = customView.findViewById(R.id.menu_new_tab);
+        if (btnNewTab != null) {
+            btnNewTab.setOnClickListener(v -> {
+                popupWindow.dismiss();
+                addAlbum(getString(R.string.app_name), sp.getString("favoriteURL", "file:///android_asset/home.html"), true);
+            });
+        }
+        View btnIncognito = customView.findViewById(R.id.menu_incognito_tab);
+        if (btnIncognito != null) {
+            btnIncognito.setOnClickListener(v -> {
+                popupWindow.dismiss();
+                addAlbum("Incognito Tab", sp.getString("favoriteURL", "file:///android_asset/home.html"), true);
+                NinjaToast.show(BrowserActivity.this, "Opened Incognito Tab");
+            });
+        }
+        View btnHistory = customView.findViewById(R.id.menu_history);
+        if (btnHistory != null) {
+            btnHistory.setOnClickListener(v -> {
+                popupWindow.dismiss();
+                com.petal.browser.compose.history.PetalHistoryBridge.showHistory(
+                    BrowserActivity.this,
+                    url -> {
                         if (ninjaWebView != null) {
-                            ninjaWebView.reload();
+                            ninjaWebView.loadUrl(url);
                         }
-                    }
-
-                    @Override
-                    public void onNewTab() {
-                        addAlbum(getString(R.string.app_name), sp.getString("favoriteURL", "file:///android_asset/home.html"), true);
-                    }
-
-                    @Override
-                    public void onNewIncognitoTab() {
-                        addAlbum("Incognito Tab", sp.getString("favoriteURL", "file:///android_asset/home.html"), true);
-                        NinjaToast.show(BrowserActivity.this, "Opened Incognito Tab (Standard Session)");
-                    }
-
-                    @Override
-                    public void onOpenHistory() {
-                        com.petal.browser.compose.history.PetalHistoryBridge.showHistory(
-                            BrowserActivity.this,
-                            url -> {
-                                if (ninjaWebView != null) {
-                                    ninjaWebView.loadUrl(url);
-                                }
-                            },
-                            () -> startActivity(new Intent(BrowserActivity.this, com.petal.browser.activity.Settings_Delete.class))
-                        );
-                    }
-
-                    @Override
-                    public void onDeleteBrowsingData() {
-                        startActivity(new Intent(BrowserActivity.this, com.petal.browser.activity.Settings_Delete.class));
-                    }
-
-                    @Override
-                    public void onOpenDownloads() {
-                        startActivity(Intent.createChooser(new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS), null));
-                    }
-
-                    @Override
-                    public void onOpenBookmarks() {
-                        showOverview();
-                    }
-
-                    @Override
-                    public void onBookmarkAllTabs() {
-                        for (com.petal.browser.browser.AlbumController album : com.petal.browser.browser.BrowserContainer.list()) {
-                            if (album instanceof NinjaWebView) {
-                                NinjaWebView webView = (NinjaWebView) album;
-                                if (webView.getUrl() != null && !webView.getUrl().isEmpty()) {
-                                    saveBookmark(webView.getTitle(), webView.getUrl());
-                                }
-                            }
-                        }
-                        NinjaToast.show(BrowserActivity.this, R.string.app_done);
-                    }
-
-                    @Override
-                    public void onSearchOnSite() {
-                        searchOnSite();
-                    }
-
-                    @Override
-                    public void onPrintPdf() {
-                        if (ninjaWebView != null) {
-                            PrintManager printManager = (PrintManager) getSystemService(Context.PRINT_SERVICE);
-                            PrintDocumentAdapter printAdapter = ninjaWebView.createPrintDocumentAdapter(finalTitle);
-                            if (printManager != null) {
-                                printManager.print(finalTitle, printAdapter, new PrintAttributes.Builder().build());
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onSavePage() {
-                        HelperUnit.saveAs(BrowserActivity.this, finalUrl, null, null);
-                    }
-
-                    @Override
-                    public void onShareLink() {
-                        shareLink(finalTitle, finalUrl);
-                    }
-
-                    @Override
-                    public void onViewSource() {
-                        if (ninjaWebView != null && finalUrl != null && !finalUrl.startsWith("view-source:")) {
-                            ninjaWebView.loadUrl("view-source:" + finalUrl);
-                        }
-                    }
-
-                    @Override
-                    public void onOpenSettings() {
-                        try {
-                            contentFrame.removeAllViews();
-                            View settingsView = com.petal.browser.compose.settings.PetalSettingsBridge.createSettingsView(BrowserActivity.this, () -> {
-                                showAlbum(currentAlbumController);
-                                return kotlin.Unit.INSTANCE;
-                            });
-                            contentFrame.addView(settingsView);
-                        } catch (Exception e) {
-                            startActivity(new Intent(BrowserActivity.this, Settings_Activity.class));
+                    },
+                    () -> startActivity(new Intent(BrowserActivity.this, com.petal.browser.activity.Settings_Delete.class))
+                );
+            });
+        }
+        View btnDeleteData = customView.findViewById(R.id.menu_delete_data);
+        if (btnDeleteData != null) {
+            btnDeleteData.setOnClickListener(v -> {
+                popupWindow.dismiss();
+                startActivity(new Intent(BrowserActivity.this, com.petal.browser.activity.Settings_Delete.class));
+            });
+        }
+        View btnDownloads = customView.findViewById(R.id.menu_downloads);
+        if (btnDownloads != null) {
+            btnDownloads.setOnClickListener(v -> {
+                popupWindow.dismiss();
+                startActivity(Intent.createChooser(new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS), null));
+            });
+        }
+        View btnBookmarks = customView.findViewById(R.id.menu_bookmarks);
+        if (btnBookmarks != null) {
+            btnBookmarks.setOnClickListener(v -> {
+                popupWindow.dismiss();
+                showOverview();
+            });
+        }
+        View btnBookmarkAll = customView.findViewById(R.id.menu_bookmark_all);
+        if (btnBookmarkAll != null) {
+            btnBookmarkAll.setOnClickListener(v -> {
+                popupWindow.dismiss();
+                for (com.petal.browser.browser.AlbumController album : com.petal.browser.browser.BrowserContainer.list()) {
+                    if (album instanceof NinjaWebView) {
+                        NinjaWebView webView = (NinjaWebView) album;
+                        if (webView.getUrl() != null && !webView.getUrl().isEmpty()) {
+                            saveBookmark(webView.getTitle(), webView.getUrl());
                         }
                     }
                 }
-            );
-        } catch (Exception e) {
-            Log.e(TAG, "Error showing overflow menu", e);
+                NinjaToast.show(BrowserActivity.this, R.string.app_done);
+            });
         }
+        View btnSearchSite = customView.findViewById(R.id.menu_search_site);
+        if (btnSearchSite != null) {
+            btnSearchSite.setOnClickListener(v -> {
+                popupWindow.dismiss();
+                searchOnSite();
+            });
+        }
+        View btnShare = customView.findViewById(R.id.menu_share);
+        if (btnShare != null) {
+            btnShare.setOnClickListener(v -> {
+                popupWindow.dismiss();
+                if (ninjaWebView != null) {
+                    shareLink(ninjaWebView.getTitle(), ninjaWebView.getUrl());
+                }
+            });
+        }
+        View btnSettings = customView.findViewById(R.id.menu_settings);
+        if (btnSettings != null) {
+            btnSettings.setOnClickListener(v -> {
+                popupWindow.dismiss();
+                try {
+                    contentFrame.removeAllViews();
+                    View settingsView = com.petal.browser.compose.settings.PetalSettingsBridge.createSettingsView(BrowserActivity.this, () -> {
+                        showAlbum(currentAlbumController);
+                        return kotlin.Unit.INSTANCE;
+                    });
+                    contentFrame.addView(settingsView);
+                } catch (Exception e) {
+                    startActivity(new Intent(BrowserActivity.this, Settings_Activity.class));
+                }
+            });
+        }
+
+        View anchor = anchorView != null ? anchorView : findViewById(R.id.item_cardView);
+        if (anchor != null) {
+            int xOffset = -(popupWidth - anchor.getWidth());
+            popupWindow.showAsDropDown(anchor, xOffset, 0);
+        } else {
+            popupWindow.showAtLocation(getWindow().getDecorView(), android.view.Gravity.TOP | android.view.Gravity.END, 16, 120);
+        }
+    }
+
+    public void showOverflow(Dialog dialog, View view, int hideMenu, String title, String url, final AdapterRecord adapterRecord, List<Record> recordList, int location) {
+        showOverflowMenu(view != null ? view : findViewById(R.id.item_cardView));
     }
 
     public void showDialogFastToggle(String title, String url, FloatingActionButton floatingActionButton) {
