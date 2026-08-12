@@ -3,528 +3,331 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Petal Home</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <title>Petal Browser - Start</title>
     <style>
         :root {
-            --bg-color: #FEF9EB;
-            --on-bg: #1D1C14;
-            --primary: #676013;
-            --on-primary: #FFFFFF;
-            --primary-container: #EFE58B;
-            --on-primary-container: #1F1C00;
-            --secondary-container: #EAE3BD;
-            --on-secondary-container: #1E1C05;
-            --tertiary-container: #D3EC9E;
-            --on-tertiary-container: #141F00;
-            --surface-high: #EDE8DA;
-            --surface-container: #F3EEE0;
-            --outline: #7A7768;
-            --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.06);
-            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.1);
-        }
-
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-color: #14140E;
-                --on-bg: #E5E2D9;
-                --primary: #C8CC78;
-                --on-primary: #313300;
-                --primary-container: #3C3F00;
-                --on-primary-container: #D1D480;
-                --secondary-container: #48473B;
-                --on-secondary-container: #E5E2D9;
-                --tertiary-container: #A5653C;
-                --on-tertiary-container: #FFFFFF;
-                --surface-high: #2A2A1F;
-                --surface-container: #201F17;
-                --outline: #929181;
-                --shadow-subtle: 0 4px 16px rgba(0, 0, 0, 0.4);
-                --shadow-md: 0 8px 28px rgba(0, 0, 0, 0.6);
-            }
+            --bg-color: #121318;
+            --surface-color: #1E1F25;
+            --surface-high: #282A32;
+            --primary: #A8C7FA;
+            --on-primary: #062E6F;
+            --on-surface: #E3E2E6;
+            --on-surface-variant: #C4C6D0;
+            --outline: #44474F;
+            --card-radius: 20dp;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: var(--bg-color);
-            color: var(--on-bg);
+            color: var(--on-surface);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 32px 20px 40px;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            padding: 24px 16px 40px;
         }
 
         .container {
             width: 100%;
-            max-width: 480px;
+            max-width: 520px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        /* Greeting & Header */
-        .greeting-text {
-            font-size: 1.5rem;
-            font-weight: 600;
-            letter-spacing: -0.5px;
-            color: var(--on-bg);
-            text-align: center;
-            margin-top: 12px;
-        }
-
-        .brand-title {
-            font-size: 2.4rem;
-            font-weight: 800;
-            color: var(--primary);
-            text-align: center;
+        /* Header Logo */
+        .logo-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 16px;
             margin-bottom: 24px;
         }
 
-        /* Expressive Search Bar */
-        .search-container {
-            width: 100%;
-            background: var(--surface-high);
-            border-radius: 50px;
-            padding: 6px 18px;
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #A8C7FA, #7CACF8);
+            border-radius: 16px;
             display: flex;
             align-items: center;
-            box-shadow: var(--shadow-subtle);
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(168, 199, 250, 0.25);
+        }
+
+        .logo-icon svg {
+            width: 28px;
+            height: 28px;
+            fill: #062E6F;
+        }
+
+        .brand-title {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #FFFFFF, #A8C7FA);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Offline Search Form */
+        .search-box {
+            width: 100%;
+            background: var(--surface-color);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 28px;
+            padding: 6px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             margin-bottom: 32px;
-            transition: all 0.25s ease;
+            transition: transform 0.2s ease, border-color 0.2s ease;
         }
 
-        .search-container:focus-within {
-            box-shadow: var(--shadow-md);
-            outline: 2px solid var(--primary);
+        .search-box:focus-within {
+            border-color: var(--primary);
+            transform: scale(1.01);
         }
 
-        .search-icon {
+        .search-box svg {
             width: 22px;
             height: 22px;
-            fill: var(--outline);
-            margin-right: 12px;
+            fill: var(--on-surface-variant);
             flex-shrink: 0;
         }
 
         .search-input {
             width: 100%;
-            border: none;
+            height: 48px;
             background: transparent;
-            color: var(--on-bg);
-            font-size: 1.05rem;
-            padding: 12px 0;
+            border: none;
             outline: none;
+            color: var(--on-surface);
+            font-size: 1rem;
+            font-weight: 400;
         }
 
         .search-input::placeholder {
-            color: var(--outline);
-            opacity: 0.85;
+            color: var(--on-surface-variant);
         }
 
-        .search-engine-select {
-            background: transparent;
-            border: none;
-            color: var(--primary);
-            font-weight: 700;
-            font-size: 0.85rem;
-            outline: none;
-            cursor: pointer;
-            padding: 0 4px;
-        }
-
-        .mic-icon {
-            width: 22px;
-            height: 22px;
-            fill: var(--primary);
-            cursor: pointer;
-            margin-left: 8px;
-            flex-shrink: 0;
-        }
-
-        /* Petal Bloom Radial Layout */
-        .bloom-section {
+        /* Speed Dial Shortcuts Grid */
+        .section-title {
             width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 32px;
-        }
-
-        .bloom-ring {
-            position: relative;
-            width: 250px;
-            height: 250px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Center Bud */
-        .center-bud {
-            width: 56px;
-            height: 56px;
-            border-radius: 20px;
-            background: var(--tertiary-container);
-            color: var(--on-tertiary-container);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 5;
-            box-shadow: var(--shadow-subtle);
-            transition: transform 0.25s ease;
-            text-decoration: none;
-        }
-
-        .center-bud:hover {
-            transform: scale(1.08);
-        }
-
-        .center-bud svg {
-            width: 28px;
-            height: 28px;
-            fill: var(--on-tertiary-container);
-        }
-
-        /* Radial Petals */
-        .petal-item {
-            position: absolute;
-            width: 64px;
-            height: 64px;
-            background: var(--secondary-container);
-            color: var(--on-secondary-container);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            font-weight: 700;
-            text-decoration: none;
-            box-shadow: var(--shadow-subtle);
-            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .petal-item:hover {
-            transform: scale(1.12);
-            z-index: 10;
-        }
-
-        /* Organic corner shapes per position */
-        .petal-0 { top: 10px; left: 93px; border-radius: 28px; }
-        .petal-1 { top: 68px; right: 15px; border-radius: 28px 12px 28px 12px; }
-        .petal-2 { bottom: 35px; right: 40px; border-radius: 12px 28px 12px 28px; }
-        .petal-3 { bottom: 35px; left: 40px; border-radius: 20px 0 20px 0; }
-        .petal-4 { top: 68px; left: 15px; border-radius: 24px; }
-
-        .bloom-labels {
             font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--outline);
-            text-align: center;
-            margin-top: 12px;
-            letter-spacing: 0.3px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--on-surface-variant);
+            margin-bottom: 16px;
+            padding-left: 4px;
         }
 
-        /* Quick Action Row */
-        .quick-actions-row {
+        .grid-speeddial {
             width: 100%;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-bottom: 24px;
+            gap: 16px;
+            margin-bottom: 32px;
         }
 
-        .quick-action-card {
-            background: var(--surface-container);
-            border-radius: 18px;
-            padding: 14px 8px;
+        .shortcut-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
             text-decoration: none;
-            color: var(--on-bg);
-            transition: transform 0.2s ease, background-color 0.2s ease;
+            color: var(--on-surface);
+            gap: 8px;
         }
 
-        .quick-action-card:hover {
-            transform: translateY(-3px);
-            background: var(--surface-high);
-        }
-
-        .quick-action-card svg {
-            width: 24px;
-            height: 24px;
-            fill: var(--primary);
-        }
-
-        .quick-action-label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--on-bg);
-        }
-
-        /* Modal Dialog */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.6);
-            display: none;
+        .shortcut-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--surface-color);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 18px;
+            display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 100;
-            padding: 20px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .modal-overlay.open { display: flex; }
+        .shortcut-item:active .shortcut-icon {
+            transform: scale(0.92);
+        }
 
-        .modal-box {
-            background: var(--bg-color);
-            border-radius: 24px;
-            padding: 24px;
+        .shortcut-label {
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--on-surface-variant);
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 64px;
+        }
+
+        /* Features Section */
+        .features-card {
             width: 100%;
-            max-width: 360px;
+            background: var(--surface-color);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             gap: 16px;
-            box-shadow: var(--shadow-md);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
         }
 
-        .modal-title { font-size: 1.1rem; font-weight: 700; }
-
-        .modal-input {
-            width: 100%;
-            padding: 10px 14px;
-            border-radius: 12px;
-            border: 1px solid var(--outline);
-            background: var(--surface-container);
-            color: var(--on-bg);
-            font-size: 0.95rem;
-            outline: none;
-        }
-
-        .modal-btns {
+        .feature-row {
             display: flex;
-            justify-content: flex-end;
-            gap: 10px;
+            align-items: center;
+            gap: 16px;
         }
 
-        .btn-cancel {
-            background: transparent;
-            border: none;
-            color: var(--outline);
-            font-weight: 600;
-            padding: 8px 14px;
-            cursor: pointer;
-        }
-
-        .btn-save {
-            background: var(--primary-container);
-            color: var(--on-primary-container);
-            border: none;
-            font-weight: 700;
-            padding: 8px 16px;
+        .feature-badge {
+            width: 40px;
+            height: 40px;
+            background: var(--surface-high);
             border-radius: 12px;
-            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .feature-badge svg {
+            width: 22px;
+            height: 22px;
+            fill: var(--primary);
+        }
+
+        .feature-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .feature-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--on-surface);
+        }
+
+        .feature-desc {
+            font-size: 0.8rem;
+            color: var(--on-surface-variant);
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-
-    <!-- Greeting & Title -->
-    <div class="greeting-text" id="greeting">Good day</div>
-    <h1 class="brand-title">Petal</h1>
-
-    <!-- Search Bar -->
-    <form class="search-container" id="search-form" onsubmit="performSearch(event)">
-        <svg class="search-icon" viewBox="0 0 24 24">
-            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-        </svg>
-        <input type="text" class="search-input" id="search-input" placeholder="Search or type a URL" autocomplete="off">
-        <select class="search-engine-select" id="engine-select">
-            <option value="https://duckduckgo.com/?q=" selected>DDG</option>
-            <option value="https://www.google.com/search?q=">Google</option>
-            <option value="https://startpage.com/do/search?query=">Startpage</option>
-            <option value="https://www.bing.com/search?q=">Bing</option>
-        </select>
-        <svg class="mic-icon" viewBox="0 0 24 24">
-            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
-        </svg>
-    </form>
-
-    <!-- Petal Bloom Radial Shortcuts -->
-    <div class="bloom-section">
-        <div class="bloom-ring" id="bloom-ring">
-            <div class="center-bud" onclick="openAddModal()" title="Add shortcut">
-                <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+    <div class="container">
+        <!-- Logo -->
+        <div class="logo-box">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
             </div>
-            <!-- Dynamic Petals inserted by JS -->
+            <h1 class="brand-title">Petal</h1>
         </div>
-        <div class="bloom-labels" id="bloom-labels">Wiki · News · Mail · Maps · Docs</div>
-    </div>
 
-    <!-- Quick Action Row -->
-    <div class="quick-actions-row">
-        <a href="ninja:bookmarks" class="quick-action-card">
-            <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
-            <span class="quick-action-label">Bookmarks</span>
-        </a>
-        <a href="ninja:history" class="quick-action-card">
-            <svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
-            <span class="quick-action-label">History</span>
-        </a>
-        <a href="ninja:downloads" class="quick-action-card">
-            <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-            <span class="quick-action-label">Downloads</span>
-        </a>
-        <a href="ninja:settings" class="quick-action-card">
-            <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-            <span class="quick-action-label">Settings</span>
-        </a>
-    </div>
+        <!-- Search Bar -->
+        <form class="search-box" action="https://duckduckgo.com/" method="get" onsubmit="return handleSearch(event)">
+            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            <input type="text" id="searchInput" class="search-input" name="q" placeholder="Search web or enter URL..." autocomplete="off">
+        </form>
 
-</div>
+        <!-- Speed Dial -->
+        <div class="section-title">Speed Dial</div>
+        <div class="grid-speeddial">
+            <a href="https://www.google.com" class="shortcut-item">
+                <div class="shortcut-icon" style="color: #4285F4;">G</div>
+                <span class="shortcut-label">Google</span>
+            </a>
+            <a href="https://duckduckgo.com" class="shortcut-item">
+                <div class="shortcut-icon" style="color: #DE5833;">DDG</div>
+                <span class="shortcut-label">DuckDuckGo</span>
+            </a>
+            <a href="https://wikipedia.org" class="shortcut-item">
+                <div class="shortcut-icon" style="color: #E3E2E6;">W</div>
+                <span class="shortcut-label">Wikipedia</span>
+            </a>
+            <a href="https://youtube.com" class="shortcut-item">
+                <div class="shortcut-icon" style="color: #FF0000;">YT</div>
+                <span class="shortcut-label">YouTube</span>
+            </a>
+            <a href="https://github.com" class="shortcut-item">
+                <div class="shortcut-icon" style="color: #FFFFFF;">GH</div>
+                <span class="shortcut-label">GitHub</span>
+            </a>
+            <a href="https://reddit.com" class="shortcut-item">
+                <div class="shortcut-icon" style="color: #FF4500;">R</div>
+                <span class="shortcut-label">Reddit</span>
+            </a>
+            <a href="https://amazon.com" class="shortcut-item">
+                <div class="shortcut-icon" style="color: #FF9900;">A</div>
+                <span class="shortcut-label">Amazon</span>
+            </a>
+            <a href="https://twitter.com" class="shortcut-item">
+                <div class="shortcut-icon" style="color: #1DA1F2;">X</div>
+                <span class="shortcut-label">X/Twitter</span>
+            </a>
+        </div>
 
-<!-- Modal Dialog for Adding Shortcuts -->
-<div class="modal-overlay" id="add-modal">
-    <div class="modal-box">
-        <div class="modal-title">Add Petal Shortcut</div>
-        <input type="text" class="modal-input" id="shortcut-name" placeholder="Title (e.g. Wiki)">
-        <input type="text" class="modal-input" id="shortcut-url" placeholder="URL (https://...)">
-        <div class="modal-btns">
-            <button class="btn-cancel" onclick="closeAddModal()">Cancel</button>
-            <button class="btn-save" onclick="saveNewShortcut()">Save</button>
+        <!-- Offline Features Card -->
+        <div class="section-title">Browser Highlights</div>
+        <div class="features-card">
+            <div class="feature-row">
+                <div class="feature-badge">
+                    <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+                </div>
+                <div class="feature-text">
+                    <span class="feature-title">Privacy Protection</span>
+                    <span class="feature-desc">Inbuilt AdBlock, tracker protection, and private mode.</span>
+                </div>
+            </div>
+            <div class="feature-row">
+                <div class="feature-badge">
+                    <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                </div>
+                <div class="feature-text">
+                    <span class="feature-title">Native Download Manager</span>
+                    <span class="feature-desc">Real-time progress bars, fast multi-thread downloading.</span>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    // Time-based greeting
-    function setGreeting() {
-        const hour = new Date().getHours();
-        let text = "Good day";
-        if (hour >= 5 && hour < 12) text = "Good morning";
-        else if (hour >= 12 && hour < 18) text = "Good afternoon";
-        else text = "Good evening";
-        document.getElementById('greeting').textContent = text;
-    }
-    setGreeting();
-
-    // Default Shortcuts
-    const defaultShortcuts = [
-        { label: 'Wiki', url: 'https://wikipedia.org' },
-        { label: 'News', url: 'https://news.ycombinator.com' },
-        { label: 'Mail', url: 'https://proton.me' },
-        { label: 'Maps', url: 'https://www.openstreetmap.org' },
-        { label: 'Docs', url: 'https://docs.google.com' }
-    ];
-
-    function getShortcuts() {
-        const saved = localStorage.getItem('petal_shortcuts');
-        if (saved) {
-            try { return JSON.parse(saved); } catch(e) {}
-        }
-        return defaultShortcuts;
-    }
-
-    function saveShortcuts(list) {
-        localStorage.setItem('petal_shortcuts', JSON.stringify(list));
-        renderBloom();
-    }
-
-    function renderBloom() {
-        const ring = document.getElementById('bloom-ring');
-        // keep only center-bud
-        const centerBud = ring.querySelector('.center-bud');
-        ring.innerHTML = '';
-        ring.appendChild(centerBud);
-
-        const list = getShortcuts();
-        const displayList = list.slice(0, 5);
-
-        displayList.forEach((item, index) => {
-            const a = document.createElement('a');
-            a.className = `petal-item petal-${index}`;
-            a.href = item.url;
-            a.textContent = item.label.charAt(0).toUpperCase();
-            a.title = item.label;
-            ring.appendChild(a);
-        });
-
-        const labelsText = displayList.map(i => i.label).join('  ·  ');
-        document.getElementById('bloom-labels').textContent = labelsText;
-    }
-
-    function openAddModal() {
-        document.getElementById('add-modal').classList.add('open');
-        document.getElementById('shortcut-name').focus();
-    }
-
-    function closeAddModal() {
-        document.getElementById('add-modal').classList.remove('open');
-        document.getElementById('shortcut-name').value = '';
-        document.getElementById('shortcut-url').value = '';
-    }
-
-    function saveNewShortcut() {
-        const name = document.getElementById('shortcut-name').value.trim();
-        let url = document.getElementById('shortcut-url').value.trim();
-        if (!name || !url) return;
-
-        if (!url.startsWith('http://') && !url.startsWith('https://')) {
-            url = 'https://' + url;
-        }
-
-        const list = getShortcuts();
-        list.push({ label: name, url: url });
-        saveShortcuts(list);
-        closeAddModal();
-    }
-
-    function isUrl(str) {
-        if (!str) return false;
-        str = str.trim();
-        if (str.startsWith('http://') || str.startsWith('https://') || str.startsWith('file://')) return true;
-        const pattern = new RegExp('^(https?:\\/\\/)?'+
-            '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+
-            '((\\d{1,3}\\.){3}\\d{1,3}))'+
-            '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+
-            '(\\?[;&a-z\\d%_.~+=-]*)?'+
-            '(\\#[-a-z\\d_]*)?$','i');
-        return !!pattern.test(str);
-    }
-
-    function performSearch(event) {
-        if (event) event.preventDefault();
-        const input = document.getElementById('search-input');
-        const query = input.value.trim();
-        if (!query) return;
-
-        if (isUrl(query)) {
-            let targetUrl = query;
-            if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://') && !targetUrl.startsWith('file://')) {
-                targetUrl = 'https://' + targetUrl;
+    <script>
+        function handleSearch(e) {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) return false;
+            
+            if (query.startsWith('http://') || query.startsWith('https://')) {
+                window.location.href = query;
+                return false;
             }
-            window.location.href = targetUrl;
-        } else {
-            const engineUrl = document.getElementById('engine-select').value;
-            window.location.href = engineUrl + encodeURIComponent(query);
+            if (query.includes('.') && !query.includes(' ')) {
+                window.location.href = 'https://' + query;
+                return false;
+            }
+            window.location.href = 'https://duckduckgo.com/?q=' + encodeURIComponent(query);
+            return false;
         }
-    }
-
-    renderBloom();
-</script>
+    </script>
 </body>
 </html>

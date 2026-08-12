@@ -2,7 +2,7 @@
  * PetalTabSwitcherSheet.kt
  * ─────────────────────────────────────────────────────────────────────────
  * Chrome Android-style Tab Switcher Overview Sheet with live tab cards,
- * active selection highlights, spring entrance animations, and close controls.
+ * active selection highlights, direct AlbumController references, and 0ms lag.
  */
 
 package com.petal.browser.ui.components
@@ -10,10 +10,12 @@ package com.petal.browser.ui.components
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
@@ -22,10 +24,12 @@ import androidx.compose.material.icons.rounded.DeleteSweep
 import androidx.compose.material.icons.rounded.Public
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.text.font.FontWeight
@@ -41,7 +45,7 @@ import com.petal.browser.view.NinjaWebView
 import com.petal.browser.ui.theme.PetalExpressiveTheme
 
 data class TabModel(
-    val id: Int,
+    val album: AlbumController,
     val title: String,
     val url: String,
     val isActive: Boolean
@@ -65,42 +69,40 @@ object PetalTabSwitcherBridge {
                 setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                 setContent {
                     PetalExpressiveTheme {
-                        val currentCount = BrowserContainer.size()
-                        val tabsList = remember(currentCount) {
-                            BrowserContainer.list().mapIndexed { index, album ->
-                                val webView = album as? NinjaWebView
-                                val rawTitle = webView?.title
-                                val rawUrl = webView?.url
-                                val displayTitle = when {
-                                    !rawTitle.isNullOrBlank() -> rawTitle
-                                    !rawUrl.isNullOrBlank() && !rawUrl.startsWith("file:///android_asset/") -> rawUrl
-                                    else -> "New Tab"
-                                }
-                                val displayUrl = rawUrl ?: "about:blank"
-                                TabModel(
-                                    id = index,
-                                    title = displayTitle,
-                                    url = displayUrl,
-                                    isActive = album == currentAlbum
+                        val tabsList = remember {
+                            mutableStateListOf<TabModel>().apply {
+                                addAll(
+                                    BrowserContainer.list().map { album ->
+                                        val webView = album as? NinjaWebView
+                                        val rawTitle = webView?.title
+                                        val rawUrl = webView?.url
+                                        val displayTitle = when {
+                                            !rawTitle.isNullOrBlank() -> rawTitle
+                                            !rawUrl.isNullOrBlank() && !rawUrl.startsWith("file:///android_asset/") -> rawUrl
+                                            else -> "New Tab"
+                                        }
+                                        val displayUrl = rawUrl ?: "about:blank"
+                                        TabModel(
+                                            album = album,
+                                            title = displayTitle,
+                                            url = displayUrl,
+                                            isActive = album == currentAlbum
+                                        )
+                                    }
                                 )
                             }
                         }
 
-                        PetalTabSwitcherSheet(
+                        PetalTabSwitcherContent(
                             tabs = tabsList,
                             onSelectTab = { model ->
                                 try { dialog.dismiss() } catch (ignored: Exception) {}
-                                if (model.id >= 0 && model.id < BrowserContainer.size()) {
-                                    val album = BrowserContainer.get(model.id)
-                                    onSelectTab(album)
-                                }
+                                onSelectTab(model.album)
                             },
                             onCloseTab = { model ->
-                                if (model.id >= 0 && model.id < BrowserContainer.size()) {
-                                    val album = BrowserContainer.get(model.id)
-                                    onCloseTab(album)
-                                }
-                                if (BrowserContainer.size() == 0) {
+                                tabsList.remove(model)
+                                onCloseTab(model.album)
+                                if (tabsList.isEmpty()) {
                                     try { dialog.dismiss() } catch (ignored: Exception) {}
                                 }
                             },
@@ -111,9 +113,6 @@ object PetalTabSwitcherBridge {
                             onNewTab = {
                                 try { dialog.dismiss() } catch (ignored: Exception) {}
                                 onNewTab()
-                            },
-                            onDismiss = {
-                                try { dialog.dismiss() } catch (ignored: Exception) {}
                             }
                         )
                     }
@@ -127,32 +126,35 @@ object PetalTabSwitcherBridge {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PetalTabSwitcherSheet(
+fun PetalTabSwitcherContent(
     tabs: List<TabModel>,
     onSelectTab: (TabModel) -> Unit,
     onCloseTab: (TabModel) -> Unit,
     onCloseAllTabs: () -> Unit,
-    onNewTab: () -> Unit,
-    onDismiss: () -> Unit
+    onNewTab: () -> Unit
 ) {
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
-        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-        dragHandle = {
-            BottomSheetDefaults.DragHandle(
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
-            )
-        }
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerHigh
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 8.dp),
+                .padding(horizontal = 20.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Top Drag Handle Indicator
+            Box(
+                modifier = Modifier
+                    .width(36.dp)
+                    .height(4.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f))
+                    .align(Alignment.CenterHorizontally)
+            )
+
             // Header Row: Count, New Tab, Close All
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -173,12 +175,8 @@ fun PetalTabSwitcherSheet(
                 }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    // New Tab (+) Button
                     FilledTonalIconButton(
-                        onClick = {
-                            onNewTab()
-                            onDismiss()
-                        },
+                        onClick = onNewTab,
                         shape = RoundedCornerShape(16.dp),
                         colors = IconButtonDefaults.filledTonalIconButtonColors(
                             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -188,7 +186,6 @@ fun PetalTabSwitcherSheet(
                         Icon(Icons.Rounded.Add, contentDescription = "New Tab")
                     }
 
-                    // Close All Button
                     IconButton(onClick = onCloseAllTabs) {
                         Icon(
                             Icons.Rounded.DeleteSweep,
@@ -199,9 +196,8 @@ fun PetalTabSwitcherSheet(
                 }
             }
 
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
 
-            // Grid of Chrome Android Style Open Tab Cards
             if (tabs.isEmpty()) {
                 Box(
                     modifier = Modifier
@@ -230,74 +226,76 @@ fun PetalTabSwitcherSheet(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(max = 440.dp)
+                        .heightIn(max = 460.dp)
                 ) {
-                    itemsIndexed(tabs, key = { _, tab -> tab.id }) { index, tab ->
+                    items(tabs, key = { it.album.hashCode() }) { tab ->
                         TabCard(
                             tab = tab,
-                            index = index,
-                            onSelect = {
-                                onSelectTab(tab)
-                                onDismiss()
-                            },
+                            onSelect = { onSelectTab(tab) },
                             onClose = { onCloseTab(tab) }
                         )
                     }
                 }
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(16.dp))
         }
     }
 }
 
 @Composable
-private fun TabCard(
+fun TabCard(
     tab: TabModel,
-    index: Int,
     onSelect: () -> Unit,
     onClose: () -> Unit
 ) {
-    val borderColor = if (tab.isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
-    val borderWidth = if (tab.isActive) 2.5.dp else 1.dp
+    val borderColor = if (tab.isActive) MaterialTheme.colorScheme.primary else Color.Transparent
+    val borderWidth = if (tab.isActive) 2.dp else 0.dp
 
-    Surface(
+    Card(
         shape = RoundedCornerShape(20.dp),
-        color = MaterialTheme.colorScheme.surfaceContainer,
+        colors = CardDefaults.cardColors(
+            containerColor = if (tab.isActive) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
+            else MaterialTheme.colorScheme.surfaceContainer
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier = Modifier
             .fillMaxWidth()
             .height(130.dp)
             .border(borderWidth, borderColor, RoundedCornerShape(20.dp))
-            .bouncyClickable(scaleDown = 0.94f, onClick = onSelect)
-            .entrance(index = index)
+            .clickable { onSelect() }
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(10.dp),
+                .padding(12.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // Tab Card Header: Icon, Title, Close X
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Top
             ) {
-                Icon(
-                    Icons.Rounded.Public,
-                    contentDescription = null,
-                    tint = if (tab.isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(Modifier.width(4.dp))
-                Text(
-                    text = if (tab.title.isBlank()) "New Tab" else tab.title,
-                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f)
-                )
+                Row(
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Rounded.Public,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = if (tab.isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = tab.title,
+                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
                 IconButton(
                     onClick = onClose,
                     modifier = Modifier.size(24.dp)
@@ -305,32 +303,33 @@ private fun TabCard(
                     Icon(
                         Icons.Rounded.Close,
                         contentDescription = "Close Tab",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(16.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
 
-            // Tab Preview Body
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(64.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(
-                        if (tab.isActive) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
-                        else MaterialTheme.colorScheme.surfaceContainerHigh
+            Text(
+                text = tab.url,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            if (tab.isActive) {
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.align(Alignment.End)
+                ) {
+                    Text(
+                        text = "Active",
+                        style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp),
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                     )
-                    .padding(8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = if (tab.url.isBlank()) "home.html" else tab.url,
-                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 10.sp),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
+                }
             }
         }
     }
