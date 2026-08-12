@@ -31,6 +31,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalDensity
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.petal.browser.ui.theme.PetalExpressiveTheme
@@ -151,12 +153,12 @@ fun PlayStoreDownloadProgress(progress: Float?) {
         CircularWavyProgressIndicator(
             progress = { animatedProgress },
             modifier = Modifier.size(36.dp),
-            strokeWidth = 3.dp
+            stroke = Stroke(width = with(LocalDensity.current) { 3.dp.toPx() })
         )
     } else {
         CircularWavyProgressIndicator(
             modifier = Modifier.size(36.dp),
-            strokeWidth = 3.dp
+            stroke = Stroke(width = with(LocalDensity.current) { 3.dp.toPx() })
         )
     }
 }
