@@ -1299,7 +1299,15 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
 
                     @Override
                     public void onOpenHistory() {
-                        showOverview();
+                        com.petal.browser.compose.history.PetalHistoryBridge.showHistory(
+                            BrowserActivity.this,
+                            url -> {
+                                if (ninjaWebView != null) {
+                                    ninjaWebView.loadUrl(url);
+                                }
+                            },
+                            () -> startActivity(new Intent(BrowserActivity.this, com.petal.browser.activity.Settings_Delete.class))
+                        );
                     }
 
                     @Override
