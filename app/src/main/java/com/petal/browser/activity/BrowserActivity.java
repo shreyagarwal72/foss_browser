@@ -1232,325 +1232,155 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
         }
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     public void showOverflow(Dialog dialog, View view, int hideMenu, String title, String url, final AdapterRecord adapterRecord, List<Record> recordList, int location) {
+        String finalTitle = title != null && !title.isEmpty() ? title : (ninjaWebView != null ? ninjaWebView.getTitle() : "New Tab");
+        String finalUrl = url != null && !url.isEmpty() ? url : (ninjaWebView != null ? ninjaWebView.getUrl() : "about:blank");
 
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
-        View dialogView = View.inflate(context, R.layout.dialog_menu_overflow, null);
-
-        LinearLayout textGroup = dialogView.findViewById(R.id.textGroup);
-        TextView overflowURL = dialogView.findViewById(R.id.overflowURL);
-        overflowURL.setText(url);
-        HelperUnit.setHighLightedText(context, overflowURL, url, HelperUnit.domain(url));
-        TextView menuTitle = dialogView.findViewById(R.id.overflowTitle);
-        menuTitle.setText(title);
-        textGroup.setOnClickListener(v -> {
-            // 1. Die Root-View deiner aktuellen Activity holen (als Parent für die Snackbar)
-            // View rootView = findViewById(android.R.id.content);
-            // 2. Optional: Eine View bestimmen, ÜBER der die Snackbar schweben soll (z.B. eine Bottom-Navigation)
-            // Wenn sie ganz normal unten am Bildschirmrand kleben soll, übergib hier einfach 'null'.
-            HelperUnit.showCustomSnackbarWithTwoActions(
-                    this, dialogView, null,
-                    title, "", url,
-                    R.drawable.icon_share, () -> {
-                        dialog_overflow.cancel();
-                        hideOverview();
-                        shareLink(title, url);
-                        return true;
-                    },
-                    R.drawable.icon_close, () -> true
-            );
-        });
-
-        String jsonReceived = getIntent().getStringExtra("SELECTED_DATA");
-        List<MenuItem> selectedItemsList;
-        if (jsonReceived != null) {
-            Type type = new TypeToken<ArrayList<MenuItem>>() {}.getType();
-            selectedItemsList = new Gson().fromJson(jsonReceived, type);
-        } else {
-            selectedItemsList = loadSelectedFromStorage();
-        }
-
-        RecyclerView recyclerView = dialogView.findViewById(R.id.recyclerViewGrid);
-        int orientation = getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-        } else {
-            recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
-        }
-
-        @SuppressLint("NonConstantResourceId")
-        AdapterMenu adapter = new AdapterMenu(selectedItemsList, item -> {
-
-            String favURL = Objects.requireNonNull(sp.getString("favoriteURL", "file:///android_asset/home.html"));
+        boolean canGoForward = ninjaWebView != null && ninjaWebView.canGoForward();
+        boolean isBookmarked = false;
+        try {
             RecordAction action = new RecordAction(context);
+            action.open(true);
+            if (finalUrl != null && action.checkUrl(finalUrl, RecordUnit.TABLE_BOOKMARK)) {
+                isBookmarked = true;
+            }
+            action.close();
+        } catch (Exception ignored) {}
 
-            dialog_overflow.cancel();
-
-            switch (item.getIconResId()) {
-                case R.drawable.icon_fav:
-                    ninjaWebView.loadUrl(favURL);
-                    break;
-                case R.drawable.icon_tab_plus:
-                    if (hideMenu ==2) {dialog.cancel();}
-                    addAlbum(HelperUnit.domain(url), url, true);
-                    break;
-                case R.drawable.icon_tab_background:
-                    addAlbum(HelperUnit.domain(url), url, false);
-                    break;
-                case R.drawable.icon_refresh:
-                    ninjaWebView.reload();
-                    break;
-                case R.drawable.icon_tab_remove:
-                    removeAlbum(currentAlbumController);
-                    if (BrowserContainer.size() < 2) {
-                        hideOverview();
+        try {
+            com.petal.browser.ui.components.PetalOverflowBridge.showOverflowMenu(
+                this,
+                finalTitle,
+                finalUrl,
+                isBookmarked,
+                canGoForward,
+                new com.petal.browser.ui.components.PetalOverflowMenuActionHandler() {
+                    @Override
+                    public void onGoForward() {
+                        if (ninjaWebView != null && ninjaWebView.canGoForward()) {
+                            ninjaWebView.goForward();
+                        }
                     }
-                    break;
-                case R.drawable.icon_close:
-                    doubleTapsQuit();
-                    break;
-                case R.drawable.icon_bookmark:
-                    saveBookmark(title, url);
-                    break;
-                case R.drawable.icon_file:
-                    PrintManager printManager = (PrintManager) getSystemService(Context.PRINT_SERVICE);
-                    PrintDocumentAdapter printAdapter = ninjaWebView.createPrintDocumentAdapter(title);
-                    Objects.requireNonNull(printManager).print(title, printAdapter, new PrintAttributes.Builder().build());
-                    sp.edit().putBoolean("pdf_create", true).apply();
-                    break;
-                case R.drawable.icon_menu_save:
-                    assert url != null;
-                    if (url.startsWith("data:")) {
-                        DataURIParser dataURIParser = new DataURIParser(url);
-                        HelperUnit.saveDataURI(activity, dataURIParser, dialog_overflow);
-                    } else HelperUnit.saveAs(activity, url, null, dialog_overflow);
-                    break;
-                case R.drawable.icon_fav_plus:
-                    sp.edit().putString("favoriteURL", url).apply();
-                    NinjaToast.show(this, R.string.app_done);
-                    break;
-                case R.drawable.icon_share:
-                    shareLink(title, url);
-                    break;
-                case R.drawable.icon_post:
-                    String text = title + ": " + url;
-                    postLink(text, dialog_overflow);
-                    break;
-                case R.drawable.icon_clipboard:
-                    copyLink(url);
-                    break;
-                case R.drawable.icon_share_open_with:
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse(url));
-                    context.startActivity(Intent.createChooser(intent, null));
-                    break;
-                case R.drawable.icon_home:
-                    HelperUnit.createShortcut(context, title, url);
-                    break;
-                case R.drawable.icon_search_site:
-                    searchOnSite();
-                    break;
-                case R.drawable.icon_download:
-                    startActivity(Intent.createChooser(new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS), null));
-                    break;
-                case R.drawable.icon_settings:
-                    Intent settings = new Intent(BrowserActivity.this, Settings_Activity.class);
-                    startActivity(settings);
-                    break;
-                case R.drawable.icon_restart:
-                    triggerRebirth(context);
-                    break;
-                case R.drawable.icon_help:
-                    Uri webpage = Uri.parse("file:///android_asset/home.html");
-                    BrowserUnit.intentURL(this, webpage);
-                    break;
-                case R.drawable.icon_delete:
-                    Snackbar snackbarSearch = Snackbar.make(view, R.string.hint_database, Snackbar.LENGTH_SHORT);
-                    HelperUnit.makeSnackbarRound(snackbarSearch);
-                    snackbarSearch.setAction(context.getString(R.string.app_ok), (v -> {
-                        action.open(true);
-                        action.deleteURL(url, RecordUnit.TABLE_START);
-                        action.deleteURL(url, RecordUnit.TABLE_BOOKMARK);
-                        action.deleteURL(url, RecordUnit.TABLE_HISTORY);
-                        action.close();
-                        initSearch();
-                        String getText = Objects.requireNonNull(search_input.getText()).toString();
-                        search_input.setText("");
-                        search_input.setText(getText);
-                        search_input.setSelection(getText.length());
-                    }));
-                    snackbarSearch.show();
-                    break;
-                case R.drawable.icon_delete_alt:
-                    Snackbar snackbarList = Snackbar.make(view, R.string.hint_database, Snackbar.LENGTH_SHORT);
-                    HelperUnit.makeSnackbarRound(snackbarList);
-                    snackbarList.setAction(context.getString(R.string.app_ok), (v -> {
-                        Record record = recordList.get(location);
-                        action.open(true);
-                        if (overViewTab.equals(getString(R.string.album_title_bookmarks))) action.deleteURL(record.getURL(), RecordUnit.TABLE_BOOKMARK);
-                        else if (overViewTab.equals(getString(R.string.album_title_history))) action.deleteURL(record.getURL(), RecordUnit.TABLE_HISTORY);
-                        action.close();
-                        recordList.remove(location);
-                        adapterRecord.notifyDataSetChanged();
-                        updateOmniBox();
-                        dialog_overflow.cancel();
-                    }));
-                    snackbarList.show();
-                    break;
-                case R.drawable.icon_edit:
 
-                    MaterialAlertDialogBuilder builderSubMenuEdit = new MaterialAlertDialogBuilder(context);
-                    View dialogViewSubMenu = View.inflate(context, R.layout.dialog_edit, null);
-                    TextInputLayout editBottomLayout = dialogViewSubMenu.findViewById(R.id.editBottomLayout);
-                    TextInputLayout editTopLayout = dialogViewSubMenu.findViewById(R.id.editTopLayout);
-                    editBottomLayout.setHint(activity.getString(R.string.dialog_URL_hint));
-                    editTopLayout.setHint(activity.getString(R.string.dialog_title_hint));
-                    EditText editTop = dialogViewSubMenu.findViewById(R.id.editTop);
-                    EditText editBottom = dialogViewSubMenu.findViewById(R.id.editBottom);
-                    editTop.setText(title);
-                    editBottom.setText(url);
-                    MaterialCardView ib_icon = dialogViewSubMenu.findViewById(R.id.editIcon);
-                    ib_icon.setVisibility(VISIBLE);
+                    @Override
+                    public void onToggleBookmark() {
+                        saveBookmark(finalTitle, finalUrl);
+                    }
 
-                    if (!overViewTab.equals(getString(R.string.album_title_bookmarks))) ib_icon.setVisibility(GONE);
-                    ib_icon.setOnClickListener(v -> {
-                        MaterialAlertDialogBuilder builderFilter = new MaterialAlertDialogBuilder(context);
-                        View dialogViewFilter = View.inflate(context, R.layout.dialog_menu, null);
-                        builderFilter.setView(dialogViewFilter);
-                        builderFilter.setTitle(R.string.setting_filter);
-                        builderFilter.setIcon(R.drawable.icon_filter);
-                        AlertDialog dialogFilter = builderFilter.create();
-                        dialogFilter.show();
-                        HelperUnit.setupDialog(context, dialogFilter);
-                        CardView cardView = dialogViewFilter.findViewById(R.id.item_CardViewItem);
-                        cardView.setVisibility(GONE);
+                    @Override
+                    public void onOpenDownloadsShortcut() {
+                        startActivity(Intent.createChooser(new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS), null));
+                    }
 
-                        GridView menuEditFilter = dialogViewFilter.findViewById(R.id.menu_grid);
-                        final List<GridItem> menuEditFilterList = new LinkedList<>();
-                        sp.edit().putString("showFilterDialogX", "true").apply();
-                        HelperUnit.addFilterItems(activity, menuEditFilterList);
-                        GridAdapter menuEditFilterAdapter = new GridAdapter(context, menuEditFilterList);
-                        menuEditFilter.setNumColumns(2);
-                        menuEditFilter.setHorizontalSpacing(20);
-                        menuEditFilter.setVerticalSpacing(20);
-                        menuEditFilter.setAdapter(menuEditFilterAdapter);
-                        menuEditFilterAdapter.notifyDataSetChanged();
-                        menuEditFilter.setOnItemClickListener((parent, view2, position, id) -> {
-                            newIcon = menuEditFilterList.get(position).getData();
-                            HelperUnit.setFilterIcons(context, ib_icon, newIcon);
-                            dialogFilter.cancel();
-                        });
-                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                                WRAP_CONTENT,
-                                WRAP_CONTENT
-                        );
-                        params.setMargins(HelperUnit.convertDpToPixel(20f, context),
-                                HelperUnit.convertDpToPixel(10f, context),
-                                HelperUnit.convertDpToPixel(20f, context),
-                                HelperUnit.convertDpToPixel(10f, context));
-                        menuEditFilter.setLayoutParams(params);
-                        dialogFilter.setOnCancelListener(dialogInterface -> sp.edit().putString("showFilterDialogX", "false").apply());
-                    });
-                    newIcon = recordList.get(location).getIconColor();
-                    HelperUnit.setFilterIcons(context, ib_icon, newIcon);
+                    @Override
+                    public void onOpenPageInfo() {
+                        if (fab_menu != null) {
+                            showDialogFastToggle(HelperUnit.domain(finalUrl), finalUrl, fab_menu);
+                        }
+                    }
 
-                    builderSubMenuEdit.setTitle(R.string.menu_edit);
-                    builderSubMenuEdit.setIcon(R.drawable.icon_edit);
-                    builderSubMenuEdit.setView(dialogViewSubMenu);
-                    Dialog dialogSubMenuEdit = builderSubMenuEdit.create();
-                    dialogSubMenuEdit.show();
-                    HelperUnit.setupDialog(context, dialogSubMenuEdit);
+                    @Override
+                    public void onReload() {
+                        if (ninjaWebView != null) {
+                            ninjaWebView.reload();
+                        }
+                    }
 
-                    Button ib_cancel = dialogViewSubMenu.findViewById(R.id.editCancel);
-                    ib_cancel.setOnClickListener(v -> dialogSubMenuEdit.cancel());
-                    Button ib_ok = dialogViewSubMenu.findViewById(R.id.editOK);
-                    ib_ok.setOnClickListener(v -> {
-                        action.open(true);
-                        action.deleteURL(url, RecordUnit.TABLE_BOOKMARK);
-                        action.deleteURL(editBottom.getText().toString(), RecordUnit.TABLE_BOOKMARK);
-                        action.addBookmark(new Record(editTop.getText().toString(), editBottom.getText().toString(), 0, newIcon));
-                        updateOmniBox();
-                        NinjaToast.show(this, R.string.app_done);
-                        action.close();
-                        bottom_navigation.setSelectedItemId(R.id.page_2);
-                        dialogSubMenuEdit.cancel();
-                    });
-                    break;
-                default:
-                    // Fallback, falls ein neuer Eintrag hinzugefügt, aber hier vergessen wurde
-                    break;
-            }
-        });
-        recyclerView.setAdapter(adapter);
-        if (!(hideMenu == 0)) {
-            removeItemByName(getString(R.string.menu_openFav), selectedItemsList, adapter);
-            removeItemByName(getString(R.string.menu_reload), selectedItemsList, adapter);
-            removeItemByName(getString(R.string.menu_restart), selectedItemsList, adapter);
-            removeItemByName(getString(R.string.menu_quit), selectedItemsList, adapter);
-            removeItemByName(getString(R.string.menu_save_pdf), selectedItemsList, adapter);
-            removeItemByName(getString(R.string.menu_other_searchSite), selectedItemsList, adapter);
-            removeItemByName(getString(R.string.setting_label), selectedItemsList, adapter);
-            removeItemByName(getString(R.string.menu_download), selectedItemsList, adapter);
-            removeItemByName(getString(R.string.app_help), selectedItemsList, adapter);
-            removeItemByName(getString(R.string.menu_closeTab), selectedItemsList, adapter);
+                    @Override
+                    public void onNewTab() {
+                        addAlbum(getString(R.string.app_name), sp.getString("favoriteURL", "file:///android_asset/home.html"), true);
+                    }
+
+                    @Override
+                    public void onNewIncognitoTab() {
+                        addAlbum("Incognito Tab", sp.getString("favoriteURL", "file:///android_asset/home.html"), true);
+                        NinjaToast.show(BrowserActivity.this, "Opened Incognito Tab (Standard Session)");
+                    }
+
+                    @Override
+                    public void onOpenHistory() {
+                        showOverview();
+                    }
+
+                    @Override
+                    public void onDeleteBrowsingData() {
+                        startActivity(new Intent(BrowserActivity.this, com.petal.browser.activity.Settings_Delete.class));
+                    }
+
+                    @Override
+                    public void onOpenDownloads() {
+                        startActivity(Intent.createChooser(new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS), null));
+                    }
+
+                    @Override
+                    public void onOpenBookmarks() {
+                        showOverview();
+                    }
+
+                    @Override
+                    public void onBookmarkAllTabs() {
+                        for (com.petal.browser.browser.AlbumController album : com.petal.browser.browser.BrowserContainer.list()) {
+                            if (album instanceof NinjaWebView) {
+                                NinjaWebView webView = (NinjaWebView) album;
+                                if (webView.getUrl() != null && !webView.getUrl().isEmpty()) {
+                                    saveBookmark(webView.getTitle(), webView.getUrl());
+                                }
+                            }
+                        }
+                        NinjaToast.show(BrowserActivity.this, R.string.app_done);
+                    }
+
+                    @Override
+                    public void onSearchOnSite() {
+                        searchOnSite();
+                    }
+
+                    @Override
+                    public void onPrintPdf() {
+                        if (ninjaWebView != null) {
+                            PrintManager printManager = (PrintManager) getSystemService(Context.PRINT_SERVICE);
+                            PrintDocumentAdapter printAdapter = ninjaWebView.createPrintDocumentAdapter(finalTitle);
+                            if (printManager != null) {
+                                printManager.print(finalTitle, printAdapter, new PrintAttributes.Builder().build());
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onSavePage() {
+                        HelperUnit.saveAs(BrowserActivity.this, finalUrl, null, null);
+                    }
+
+                    @Override
+                    public void onShareLink() {
+                        shareLink(finalTitle, finalUrl);
+                    }
+
+                    @Override
+                    public void onViewSource() {
+                        if (ninjaWebView != null && finalUrl != null && !finalUrl.startsWith("view-source:")) {
+                            ninjaWebView.loadUrl("view-source:" + finalUrl);
+                        }
+                    }
+
+                    @Override
+                    public void onOpenSettings() {
+                        try {
+                            contentFrame.removeAllViews();
+                            View settingsView = com.petal.browser.compose.settings.PetalSettingsBridge.createSettingsView(BrowserActivity.this, () -> {
+                                showAlbum(currentAlbumController);
+                                return kotlin.Unit.INSTANCE;
+                            });
+                            contentFrame.addView(settingsView);
+                        } catch (Exception e) {
+                            startActivity(new Intent(BrowserActivity.this, Settings_Activity.class));
+                        }
+                    }
+                }
+            );
+        } catch (Exception e) {
+            Log.e(TAG, "Error showing overflow menu", e);
         }
-        if (hideMenu == 0) {
-            //Main menu
-            removeItemByName(getString(R.string.menu_delete), selectedItemsList, adapter);
-            removeItemByName(getString(R.string.menu_delete_entry), selectedItemsList, adapter);
-            removeItemByName(getString(R.string.menu_edit), selectedItemsList, adapter);
-        } else if (hideMenu == 1) {
-            //Long click
-            removeItemByName(getString(R.string.menu_delete), selectedItemsList, adapter);
-            removeItemByName(getString(R.string.menu_delete_entry), selectedItemsList, adapter);
-            removeItemByName(getString(R.string.menu_edit), selectedItemsList, adapter);
-        } else if (hideMenu == 2) {
-            //List search
-            removeItemByName(getString(R.string.menu_edit), selectedItemsList, adapter);
-            removeItemByName(getString(R.string.menu_delete_entry), selectedItemsList, adapter);
-        } else if (hideMenu == 3) {
-            // Bookmark
-            removeItemByName(getString(R.string.menu_delete), selectedItemsList, adapter);
-            removeItemByName(getString(R.string.menu_save_bookmark), selectedItemsList, adapter);
-        } else if (hideMenu == 4) {
-            // History
-            removeItemByName(getString(R.string.menu_delete), selectedItemsList, adapter);
-            removeItemByName(getString(R.string.menu_edit), selectedItemsList, adapter);
-        }
-
-        builder.setView(dialogView);
-        dialog_overflow = builder.create();
-
-        FloatingActionButton buttonProfile = dialogView.findViewById(R.id.buttonProfile);
-        setProfileIcon(buttonProfile, url);
-        buttonProfile.setOnClickListener(v -> {
-            showDialogFastToggle(title,url, fab_menu);
-            dialog_overflow.cancel();
-        });
-        buttonProfile.setOnLongClickListener(v -> {
-            sp.edit().putString("profile", "profileStandard").apply();
-            setProfileIcon(buttonProfile, url);
-            dialog_overflow.cancel();
-            listStandard = new List_standard(context);
-            if (!listStandard.isWhite(url)){
-                ninjaWebView.reload();
-            }
-            return false;
-        });
-
-        List_standard listStandard = new List_standard(context);
-        TypedValue typedValue = new TypedValue();
-        Resources.Theme theme = context.getTheme();
-        theme.resolveAttribute(R.attr.colorError, typedValue, true);
-        int color = typedValue.data;
-        if (listStandard.isWhite(url)) {
-            buttonProfile.getDrawable().mutate().setTint(color);
-        }
-
-        HelperUnit.setupDialog(context, dialog_overflow);
-        FaviconHelper.setFavicon(context, dialogView, url, R.id.menu_icon, R.drawable.icon_image_broken);
-        dialog_overflow.show();
     }
 
     public void showDialogFastToggle(String title, String url, FloatingActionButton floatingActionButton) {

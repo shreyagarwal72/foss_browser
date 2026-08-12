@@ -110,14 +110,7 @@ public class AdapterSearch extends BaseAdapter implements Filterable {
         int color = typedValue.data;
         holder.albumCardView.setCardBackgroundColor(color);
 
-        try(FaviconHelper faviconHelper = new FaviconHelper(context)) {
-            Bitmap bitmap = faviconHelper.getFavicon(item.url);
-            if (bitmap != null) {
-                holder.favicon.setImageBitmap(bitmap);
-            } else {
-                holder.favicon.setImageResource(R.drawable.icon_image_broken);
-            }
-        }
+        holder.favicon.setImageResource(R.drawable.icon_image_broken);
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         String s = sp.getString("searchInput", "");
         if (!s.isEmpty()) {
