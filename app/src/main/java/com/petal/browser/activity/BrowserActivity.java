@@ -296,7 +296,7 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
                 String text = getString(R.string.app_done) + ". " + getString(R.string.menu_download) +"?";
                 Snackbar snackbar = Snackbar.make(ninjaWebView, text, Snackbar.LENGTH_SHORT);
                 HelperUnit.makeSnackbarRound(snackbar);
-                snackbar.setAction(context.getString(R.string.app_ok), v -> startActivity(Intent.createChooser(new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS), null)));
+                snackbar.setAction(context.getString(R.string.app_ok), v -> showDownloads());
                 snackbar.show();
             }};
 
@@ -389,7 +389,7 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
             String text = getString(R.string.app_done) + ". " + getString(R.string.menu_download) +"?";
             Snackbar snackbar = Snackbar.make(ninjaWebView, text, Snackbar.LENGTH_SHORT);
             HelperUnit.makeSnackbarRound(snackbar);
-            snackbar.setAction(context.getString(R.string.app_ok), v -> startActivity(Intent.createChooser(new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS), null)));
+            snackbar.setAction(context.getString(R.string.app_ok), v -> showDownloads());
             snackbar.show();
         }
         dispatchIntent(getIntent());
@@ -1348,7 +1348,8 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
 
     public void showOverflowMenu(View anchorView) {
         View customView = LayoutInflater.from(this).inflate(R.layout.popup_overflow_menu, null);
-        int popupWidth = (int) (270 * getResources().getDisplayMetrics().density);
+        View navView = findViewById(R.id.bottom_nav_compose);
+        int popupWidth = (navView != null && navView.getWidth() > 0) ? navView.getWidth() : (int) (280 * getResources().getDisplayMetrics().density);
         PopupWindow popupWindow = new PopupWindow(customView, popupWidth, ViewGroup.LayoutParams.WRAP_CONTENT, true);
         popupWindow.setElevation(16f);
         popupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -1386,7 +1387,7 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
         if (btnDownloadShortcut != null) {
             btnDownloadShortcut.setOnClickListener(v -> {
                 popupWindow.dismiss();
-                startActivity(Intent.createChooser(new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS), null));
+                showDownloads();
             });
         }
         View btnPageInfo = customView.findViewById(R.id.menu_page_info);
@@ -1450,7 +1451,7 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
         if (btnDownloads != null) {
             btnDownloads.setOnClickListener(v -> {
                 popupWindow.dismiss();
-                startActivity(Intent.createChooser(new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS), null));
+                showDownloads();
             });
         }
         View btnBookmarks = customView.findViewById(R.id.menu_bookmarks);
@@ -1508,40 +1509,22 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
             });
         }
 
-        View anchor = anchorView;
-        if (anchor == null) {
-            anchor = findViewById(R.id.bottom_nav_compose);
-        }
-        if (anchor == null || anchor.getVisibility() != View.VISIBLE) {
-            anchor = findViewById(R.id.fab_menu);
-        }
-        if (anchor == null || anchor.getVisibility() != View.VISIBLE) {
-            anchor = findViewById(R.id.appBar_buttons);
-        }
-
         android.util.DisplayMetrics dm = getResources().getDisplayMetrics();
-        int marginEnd = (int) (12 * dm.density);
+        int marginX = (dm.widthPixels - popupWidth) / 2;
+        if (marginX < 0) marginX = (int) (12 * dm.density);
+        popupWindow.showAtLocation(getWindow().getDecorView(), android.view.Gravity.BOTTOM | android.view.Gravity.START, marginX, (int) (75 * dm.density));
+    }
 
-        if (anchor != null && anchor.getVisibility() == View.VISIBLE) {
-            int[] location = new int[2];
-            anchor.getLocationOnScreen(location);
-            int anchorY = location[1];
-            int screenHeight = dm.heightPixels;
-
-            boolean isBottomHalf = anchorY > (screenHeight / 2);
-
-            if (isBottomHalf) {
-                int marginBottom = screenHeight - anchorY + (int) (8 * dm.density);
-                if (marginBottom < (int) (60 * dm.density)) {
-                    marginBottom = (int) (80 * dm.density);
-                }
-                popupWindow.showAtLocation(getWindow().getDecorView(), android.view.Gravity.BOTTOM | android.view.Gravity.END, marginEnd, marginBottom);
-            } else {
-                int xOffset = -(popupWidth - anchor.getWidth());
-                popupWindow.showAsDropDown(anchor, xOffset, (int) (8 * dm.density));
-            }
-        } else {
-            popupWindow.showAtLocation(getWindow().getDecorView(), android.view.Gravity.BOTTOM | android.view.Gravity.END, marginEnd, (int) (80 * dm.density));
+    public void showDownloads() {
+        try {
+            contentFrame.removeAllViews();
+            View downloadView = PetalDownloadBridge.createDownloadView(BrowserActivity.this, () -> {
+                showAlbum(currentAlbumController);
+                return kotlin.Unit.INSTANCE;
+            });
+            contentFrame.addView(downloadView);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -2495,7 +2478,7 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
                 ninjaWebView.reload();
                 break;
             case "29":
-                startActivity(Intent.createChooser(new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS), null));
+                showDownloads();
                 break;
             case "30":
                 overViewTab = getString(R.string.album_title_bookmarks);

@@ -6,34 +6,25 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
-private val TrackHeight = 46.dp
-private val ThumbSize = 30.dp
-private val ThumbInset = 8.dp
+private val TrackHeight = 40.dp
+private val ThumbSize = 28.dp
 
 /**
- * ImageToolbox / Stride-style expressive slider: a chunky pill track with a filled
- * section and a circular rolling thumb that rides inside the pill.
+ * Material 3 Expressive Fancy Slider with smooth pill progress track,
+ * dynamic thumb elevation, and responsive gesture feedback.
  */
 @Composable
 fun StrideSlider(
@@ -44,6 +35,16 @@ fun StrideSlider(
     enabled: Boolean = true,
     onValueChangeFinished: (() -> Unit)? = null,
 ) {
+    val fraction = ((value - valueRange.start) / (valueRange.endInclusive - valueRange.start)).coerceIn(0f, 1f)
+    val animatedFraction by animateFloatAsState(
+        targetValue = fraction,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = 800f
+        ),
+        label = "fancySliderFraction"
+    )
+
     Slider(
         value = value,
         onValueChange = onValueChange,
@@ -51,58 +52,45 @@ fun StrideSlider(
         enabled = enabled,
         onValueChangeFinished = onValueChangeFinished,
         modifier = modifier.height(TrackHeight),
-        thumb = {},
-        track = { state ->
-            val target = (
-                (state.value - state.valueRange.start) /
-                    (state.valueRange.endInclusive - state.valueRange.start)
-                ).coerceIn(0f, 1f)
-
-            val fraction by animateFloatAsState(
-                targetValue = target,
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioNoBouncy,
-                    stiffness = 900f,
-                ),
-                label = "sliderFraction",
-            )
-
-            BoxWithConstraints(
+        thumb = {
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(TrackHeight)
-                    .clip(RoundedCornerShape(50))
-                    .background(MaterialTheme.colorScheme.surfaceContainerHighest),
+                    .size(ThumbSize)
+                    .shadow(elevation = 6.dp, shape = CircleShape)
+                    .clip(CircleShape)
+                    .background(
+                        if (enabled) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.outlineVariant
+                    ),
+                contentAlignment = Alignment.Center
             ) {
-                val travel = maxWidth - ThumbSize - ThumbInset * 2
-                val thumbStart = ThumbInset + travel * fraction
-
-                val circumference = ThumbSize.value * Math.PI.toFloat()
-                val rollDegrees = (travel.value * fraction / circumference) * 360f
-
                 Box(
                     modifier = Modifier
-                        .fillMaxHeight()
-                        .width(thumbStart + ThumbSize + ThumbInset)
-                        .clip(RoundedCornerShape(50))
-                        .background(
-                            if (enabled) MaterialTheme.colorScheme.primaryContainer
-                            else MaterialTheme.colorScheme.outlineVariant,
-                        ),
-                )
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .offset(x = thumbStart)
-                        .size(ThumbSize)
-                        .graphicsLayer { rotationZ = rollDegrees }
+                        .size(10.dp)
                         .clip(CircleShape)
-                        .background(
-                            if (enabled) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.surfaceContainer,
-                        ),
+                        .background(MaterialTheme.colorScheme.onPrimary)
                 )
             }
         },
+        track = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(TrackHeight)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth(fraction = animatedFraction)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(
+                            if (enabled) MaterialTheme.colorScheme.primaryContainer
+                            else MaterialTheme.colorScheme.outlineVariant
+                        )
+                )
+            }
+        }
     )
 }

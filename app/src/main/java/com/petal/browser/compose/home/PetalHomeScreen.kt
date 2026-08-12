@@ -34,6 +34,10 @@ import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.rounded.Tab
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -203,15 +207,6 @@ fun PetalHomeScreen(
                     onAddShortcut = onAddShortcut,
                 )
 
-                Spacer(Modifier.height(32.dp))
-
-                QuickActionRow(
-                    onOpenBookmarks = onOpenBookmarks,
-                    onOpenHistory = onOpenHistory,
-                    onOpenDownloads = onOpenDownloads,
-                    onOpenSettings = onOpenSettings,
-                )
-
                 Spacer(Modifier.height(96.dp))
             }
         }
@@ -229,36 +224,61 @@ private fun greeting(name: String?): String {
 
 @Composable
 private fun PetalSearchBar(onSearch: (String) -> Unit) {
+    var searchText by remember { mutableStateOf("") }
     Surface(
-        onClick = { onSearch("") },
         shape = RoundedCornerShape(50),
         color = MaterialTheme.colorScheme.surfaceContainerHigh,
-        tonalElevation = 1.dp,
+        tonalElevation = 2.dp,
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = 56.dp),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 20.dp),
+            modifier = Modifier.padding(horizontal = 16.dp),
         ) {
             Icon(
                 Icons.Rounded.Search,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            Spacer(Modifier.width(12.dp))
-            Text(
-                "Search or type a URL",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.weight(1f),
+            Spacer(Modifier.width(8.dp))
+            TextField(
+                value = searchText,
+                onValueChange = { searchText = it },
+                placeholder = {
+                    Text(
+                        "Search or type web address",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                keyboardActions = KeyboardActions(
+                    onSearch = {
+                        if (searchText.isNotBlank()) {
+                            onSearch(searchText.trim())
+                        }
+                    }
+                ),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                modifier = Modifier.weight(1f)
             )
-            Icon(
-                Icons.Rounded.Mic,
-                contentDescription = "Voice search",
-                tint = MaterialTheme.colorScheme.primary,
-            )
+            if (searchText.isNotBlank()) {
+                IconButton(onClick = { onSearch(searchText.trim()) }) {
+                    Icon(
+                        Icons.Rounded.ArrowForward,
+                        contentDescription = "Search",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
         }
     }
 }

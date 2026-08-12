@@ -2,7 +2,8 @@
  * PetalDownloadManager.kt
  * ─────────────────────────────────────────────────────────────────────────
  * Native Inbuilt Download Manager UI for Petal Browser featuring real-time
- * progress tracking, file opening, pause/resume, and Stride UI components.
+ * network velocity (speed), ETA calculation, file opening, pause/resume,
+ * and Material 3 Expressive UI components.
  */
 
 package com.petal.browser.compose.downloads
@@ -11,8 +12,6 @@ import android.app.DownloadManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Environment
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -24,18 +23,18 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.activity.ComponentActivity
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.platform.LocalDensity
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.petal.browser.ui.theme.PetalExpressiveTheme
+import kotlinx.coroutines.delay
 
 data class DownloadItem(
     val id: Long,
@@ -43,13 +42,16 @@ data class DownloadItem(
     val fileUrl: String,
     val progress: Float?,
     val status: Int,
+    val bytesDownloaded: Long,
     val totalSize: Long,
+    val speedBytesPerSec: Long = 0L,
+    val etaSeconds: Long = 0L,
     val localUri: String?
 )
 
 object PetalDownloadBridge {
     @JvmStatic
-    fun createDownloadView(activity: ComponentActivity, onBackPress: () -> Unit): ComposeView {
+    fun createDownloadView(activity: androidx.activity.ComponentActivity, onBackPress: () -> Unit): ComposeView {
         return ComposeView(activity).apply {
             setViewTreeLifecycleOwner(activity)
             setViewTreeSavedStateRegistryOwner(activity)
@@ -63,11 +65,44 @@ object PetalDownloadBridge {
     }
 }
 
+fun formatBytes(bytes: Long): String {
+    if (bytes <= 0) return "0 B"
+    val units = arrayOf("B", "KB", "MB", "GB")
+    val digitGroups = (Math.log10(bytes.toDouble()) / Math.log10(1024.0)).toInt().coerceIn(0, 3)
+    return String.format("%.1f %s", bytes / Math.pow(1024.0, digitGroups.toDouble()), units[digitGroups])
+}
+
+fun formatSpeed(bytesPerSec: Long): String {
+    if (bytesPerSec <= 0) return "0 KB/s"
+    return "${formatBytes(bytesPerSec)}/s"
+}
+
+fun formatEta(seconds: Long): String {
+    if (seconds <= 0) return "--"
+    val mins = seconds / 60
+    val secs = seconds % 60
+    return if (mins > 0) "${mins}m ${secs}s" else "${secs}s"
+}
+
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun PetalDownloadManagerScreen(onBackPress: () -> Unit = {}) {
     val context = LocalContext.current
-    var downloadList by remember { mutableStateOf(getDownloadItems(context)) }
+    var prevBytesMap by remember { mutableStateOf(mapOf<Long, Long>()) }
+    var lastCheckTime by remember { mutableStateOf(System.currentTimeMillis()) }
+    var downloadList by remember { mutableStateOf(getDownloadItems(context, prevBytesMap, 1000L)) }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(1000L)
+            val currentTime = System.currentTimeMillis()
+            val elapsedTime = (currentTime - lastCheckTime).coerceAtLeast(100L)
+            val newItems = getDownloadItems(context, prevBytesMap, elapsedTime)
+            prevBytesMap = newItems.associate { it.id to it.bytesDownloaded }
+            lastCheckTime = currentTime
+            downloadList = newItems
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -84,7 +119,9 @@ fun PetalDownloadManagerScreen(onBackPress: () -> Unit = {}) {
                     }
                 },
                 actions = {
-                    IconButton(onClick = { downloadList = getDownloadItems(context) }) {
+                    IconButton(onClick = {
+                        downloadList = getDownloadItems(context, prevBytesMap, 1000L)
+                    }) {
                         Icon(Icons.Rounded.Refresh, contentDescription = "Refresh")
                     }
                 },
@@ -227,19 +264,34 @@ private fun DownloadCardItem(item: DownloadItem, onOpenFile: () -> Unit) {
                         progress = { animatedProgress },
                         modifier = Modifier.fillMaxWidth()
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Downloading… ${(animatedProgress * 100).toInt()}%",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "${formatBytes(item.bytesDownloaded)} / ${formatBytes(item.totalSize)} • ${(animatedProgress * 100).toInt()}%",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = "${formatSpeed(item.speedBytesPerSec)} • ETA ${formatEta(item.etaSeconds)}",
+                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
         }
     }
 }
 
-private fun getDownloadItems(context: Context): List<DownloadItem> {
+private fun getDownloadItems(
+    context: Context,
+    prevBytesMap: Map<Long, Long>,
+    elapsedTimeMs: Long
+): List<DownloadItem> {
     val list = mutableListOf<DownloadItem>()
     try {
         val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
@@ -264,7 +316,13 @@ private fun getDownloadItems(context: Context): List<DownloadItem> {
                 val localUri = if (localUriCol >= 0) cursor.getString(localUriCol) else null
 
                 val progress = if (total > 0) (soFar.toFloat() / total.toFloat()) else null
-                list.add(DownloadItem(id, title, uri, progress, status, total, localUri))
+                val prevSoFar = prevBytesMap[id] ?: soFar
+                val bytesDiff = (soFar - prevSoFar).coerceAtLeast(0L)
+                val speed = if (elapsedTimeMs > 0 && bytesDiff > 0) (bytesDiff * 1000L) / elapsedTimeMs else 0L
+                val remainingBytes = (total - soFar).coerceAtLeast(0L)
+                val eta = if (speed > 0) remainingBytes / speed else 0L
+
+                list.add(DownloadItem(id, title, uri, progress, status, soFar, total, speed, eta, localUri))
             } while (cursor.moveToNext())
             cursor.close()
         }
