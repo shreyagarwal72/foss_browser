@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">FOSS Браузер</string>
+    <string name="app_name">Petal Браузер</string>
     <string name="app_ok">ОК</string>
     <string name="app_help">Допомога</string>
     <string name="app_cancel">Скасувати</string>
@@ -109,7 +109,7 @@
     <string name="toast_input_empty">Будь ласка, введіть щось.</string>
     <string name="toast_webview_forward">Не вдається завантажити наступний сайт.</string>
     <string name="toast_restart">Перезапустити, щоб застосувати зміни?</string>
-    <string name="toast_quit">Закрити FOSS Браузер?</string>
+    <string name="toast_quit">Закрити Petal Браузер?</string>
     <string name="toast_quit_TAB">Закрити вкладку?</string>
     <string name="toast_unsecured">Цей сайт використовує незахищене з’єднання (http). Спробувати захищене з’єднання (https)?</string>
     <string name="toast_backup">Зберегти дані? Буде перезаписано наявну резервну копію.</string>
@@ -120,8 +120,8 @@
     <string name="menu_nightView">Нічна тема</string>
     <string name="setting_title_camera">Дозвіл на використання камери</string>
     <string name="setting_title_microphone">Дозвіл на використання мікрофона</string>
-    <string name="setting_summary_tabsReload">Оновити останні відкриті вкладки при запуску FOSS Браузера.</string>
-    <string name="setting_summary_tabsRestore">Відновити вкладки у разі збою FOSS Браузера.</string>
+    <string name="setting_summary_tabsReload">Оновити останні відкриті вкладки при запуску Petal Браузера.</string>
+    <string name="setting_summary_tabsRestore">Відновити вкладки у разі збою Petal Браузера.</string>
     <string name="hint_DRM_Media">Дозволити відтворення медіа, захищених DRM?</string>
     <string name="menu_reload">Оновити</string>
     <string name="menu_restart">Перезавантажити та оновити вкладки</string>
@@ -132,7 +132,7 @@
     <string name="setting_title_cookie_thirdParty">Сторонні куки</string>
     <string name="title_appDatabase">База даних</string>
     <string name="app_error_save">Уже збережено.</string>
-    <string name="app_intro_b">Наразі відкритим сайтом є Wiki про FOSS Браузер. Цей сайт також зберeжено як вашу першу закладку. У Wiki ви можете знайти корисні поради та посилання.</string>
+    <string name="app_intro_b">Наразі відкритим сайтом є Wiki про Petal Браузер. Цей сайт також зберeжено як вашу першу закладку. У Wiki ви можете знайти корисні поради та посилання.</string>
     <string name="menu_shareOpenWith">Відкрити за допомогою…</string>
     <string name="app_intro_a">Дякуємо за використання Petal!</string>
     <string name="setting_title_deny_cookie_banners">Відхиляти банери про cookie</string>

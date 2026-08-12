@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Przeglądarka FOSS</string>
+    <string name="app_name">Przeglądarka Petal</string>
     <string name="app_ok">OK</string>
     <string name="app_help">Pomoc</string>
     <string name="app_cancel">Anuluj</string>
@@ -133,7 +133,7 @@
     <string name="title_appDatabase">Baza danych</string>
     <string name="app_error_save">Już zapisane.</string>
     <string name="app_intro_a">Dziękujemy za korzystanie z Petal!</string>
-    <string name="app_intro_b">Aktualnie otwartą stroną jest WIKI przeglądarki FOSS. Strona ta jest również zapisywana jako pierwsza zakładka. Na WIKI można znaleźć pomocne wskazówki i linki.</string>
+    <string name="app_intro_b">Aktualnie otwartą stroną jest WIKI przeglądarki Petal. Strona ta jest również zapisywana jako pierwsza zakładka. Na WIKI można znaleźć pomocne wskazówki i linki.</string>
     <string name="menu_shareOpenWith">Otwórz za pomocą …</string>
     <string name="dialog_sortDomain">Sortuj według domeny</string>
     <string name="setting_title_deny_cookie_banners">Cookie Banner Blocker</string>

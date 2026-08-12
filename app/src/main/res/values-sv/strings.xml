@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">FOSS webbläsare</string>
+    <string name="app_name">Petal webbläsare</string>
     <string name="app_ok">Ok</string>
     <string name="app_help">Hjälp</string>
     <string name="app_cancel">Avbryt</string>
@@ -120,8 +120,8 @@
     <string name="menu_nightView">Nattvy</string>
     <string name="setting_title_camera">Tillåt kameraanvändning</string>
     <string name="setting_title_microphone">Tillåt mikrofonanvändning</string>
-    <string name="setting_summary_tabsReload">Ladda om senast öppnade flikar, när du startar FOSS webbläsare.</string>
-    <string name="setting_summary_tabsRestore">Återställ flikar, när FOSS webbläsare blir avstängd av systemet.</string>
+    <string name="setting_summary_tabsReload">Ladda om senast öppnade flikar, när du startar Petal webbläsare.</string>
+    <string name="setting_summary_tabsRestore">Återställ flikar, när Petal webbläsare blir avstängd av systemet.</string>
     <string name="hint_DRM_Media">Tillåt DRM-skyddad medieuppspelning?</string>
     <string name="menu_reload">Ladda om</string>
     <string name="menu_restart">Starta om och ladda om flikar</string>

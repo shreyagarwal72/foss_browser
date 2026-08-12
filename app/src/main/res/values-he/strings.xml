@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">דפדפן FOSS</string>
+    <string name="app_name">דפדפן Petal</string>
     <string name="app_ok">בסדר</string>
     <string name="app_help">עזרה</string>
     <string name="app_cancel">בטל</string>
@@ -109,7 +109,7 @@
     <string name="toast_input_empty">לא הזנת כלום.</string>
     <string name="toast_webview_forward">לא ניתן לטעון את האתר הבא</string>
     <string name="toast_restart">עליך להפעיל מחדש את \"Petal\" כדי להחיל שינויים. לסגור עכשיו?</string>
-    <string name="toast_quit">האם ברצונך לצאת מ\"דפדפן FOSS\"?</string>
+    <string name="toast_quit">האם ברצונך לצאת מ\"דפדפן Petal\"?</string>
     <string name="toast_quit_TAB">האם אתה רוצה לסגור את ה-TAB?</string>
     <string name="toast_unsecured">האתר משתמש בחיבור לא מאובטח (\"http\"). האם לנסות חיבור מאובטח (\"https\")?</string>
     <string name="toast_backup">גיבוי נתונים\? פעולה זו תחליף את הגיבוי הישן.</string>
@@ -120,8 +120,8 @@
     <string name="menu_nightView">תצוגת לילה</string>
     <string name="setting_title_camera">אפשר שימוש במצלמה</string>
     <string name="setting_title_microphone">אפשר שימוש במיקרופון</string>
-    <string name="setting_summary_tabsReload">טען מחדש את הכרטיסיות שנפתחו לאחרונה, בעת הפעלת דפדפן FOSS.</string>
-    <string name="setting_summary_tabsRestore">שחזר כרטיסיות, כאשר דפדפן FOSS נהרג על ידי המערכת.</string>
+    <string name="setting_summary_tabsReload">טען מחדש את הכרטיסיות שנפתחו לאחרונה, בעת הפעלת דפדפן Petal.</string>
+    <string name="setting_summary_tabsRestore">שחזר כרטיסיות, כאשר דפדפן Petal נהרג על ידי המערכת.</string>
     <string name="hint_DRM_Media">האם לאפשר השמעת מדיה מוגנת ב-DRM?</string>
     <string name="menu_reload">טעינה חמחדש</string>
     <string name="menu_restart">הפעל מחדש וטען מחדש כרטיסיות</string>
@@ -154,6 +154,6 @@
     <string name="title_appDatabase">מסד נתונים</string>
     <string name="setting_menu">תפריט</string>
     <string name="menu_delete_entry">מחק רשומה</string>
-    <string name="app_intro_a">תודה על השימוש בדפדפן FOSS!</string>
-    <string name="app_intro_b">האתר הפתוח כרגע הוא ה-WIKI של דפדפן FOSS. אתר זה נשמר גם כסימניה הראשונה שלך. ב-WIKI תוכל למצוא טיפים וקישורים שימושיים.</string>
+    <string name="app_intro_a">תודה על השימוש בדפדפן Petal!</string>
+    <string name="app_intro_b">האתר הפתוח כרגע הוא ה-WIKI של דפדפן Petal. אתר זה נשמר גם כסימניה הראשונה שלך. ב-WIKI תוכל למצוא טיפים וקישורים שימושיים.</string>
 </resources>

@@ -133,8 +133,8 @@
     <string name="title_appDatabase">قاعدة البيانات</string>
     <string name="app_error_save">تم الحفظ بالفعل.</string>
     <string name="menu_shareOpenWith">افتح مع …</string>
-    <string name="app_intro_a">شكراً لاستخدامك متصفح FOSS!</string>
-    <string name="app_intro_b">الموقع المفتوح حالياً هو WIKI لمتصفح FOSS. يتم حفظ هذا الموقع أيضاً كأول إشارة مرجعية لك. في WIKI يمكنك العثور على نصائح وروابط مفيدة.</string>
+    <string name="app_intro_a">شكراً لاستخدامك متصفح Petal!</string>
+    <string name="app_intro_b">الموقع المفتوح حالياً هو WIKI لمتصفح Petal. يتم حفظ هذا الموقع أيضاً كأول إشارة مرجعية لك. في WIKI يمكنك العثور على نصائح وروابط مفيدة.</string>
     <string name="dialog_sortDomain">فرز حسب المجال</string>
     <string name="setting_title_deny_cookie_banners">مانع شعارات ملفات تعريف الارتباط</string>
     <string name="dialog_tracking">عنوان URL التتبع المحتمل. إزالة جزء التتبع:</string>

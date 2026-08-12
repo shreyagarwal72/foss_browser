@@ -134,7 +134,7 @@
     <string name="app_error_save">Já guardado.</string>
     <string name="menu_shareOpenWith">Abrir com …</string>
     <string name="app_intro_a">Obrigado por utilizar o Petal!</string>
-    <string name="app_intro_b">O site atualmente aberto é a WIKI do Navegador FOSS. Este site também é guardado como o seu primeiro Favorito. Na WIKI pode encontrar dicas e ligações úteis.</string>
+    <string name="app_intro_b">O site atualmente aberto é a WIKI do Navegador Petal. Este site também é guardado como o seu primeiro Favorito. Na WIKI pode encontrar dicas e ligações úteis.</string>
     <string name="setting_title_deny_cookie_banners">Bloqueador de banners de cookies</string>
     <string name="dialog_sortDomain">Ordenar por domínio</string>
     <string name="app_no">Não</string>

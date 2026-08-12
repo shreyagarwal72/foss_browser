@@ -1,64 +1,46 @@
-<p align="center">
-<img src="https://codeberg.org/Gaukler_Faun/FOSS_Browser/raw/branch/master/fastlane/metadata/android/en-US/images/featuresGraphic.png" alt="FOSS Browser" width="600"/>
-</p>
+# 🌸 Petal Browser
 
-<p align="center">
-<a href="https://translate.codeberg.org/engage/foss-browser/">
-<img src="https://translate.codeberg.org/widgets/foss-browser/-/strings/287x66-white.png" alt="Übersetzungsstatus" />
-</a></p>
+**Petal Browser** is a fast, ultra-lightweight, and privacy-focused Android web browser built with **Material 3 Expressive Design**, Jetpack Compose, and native Android WebView technology. Inspired by Chrome and Cromite Android UI architectures, Petal delivers a 60fps lag-free browsing experience with dynamic wallpaper colors, dark surface containers, and spring-physics micro-interactions.
 
+---
 
-__[README](https://codeberg.org/Gaukler_Faun/FOSS_Browser/src/branch/master/README.md)__ | __[WIKI](https://codeberg.org/Gaukler_Faun/FOSS_Browser/wiki)__ | __[FAQs](https://codeberg.org/Gaukler_Faun/FOSS_Browser/src/branch/master/FAQs.md)__ | __[Releases](https://codeberg.org/Gaukler_Faun/FOSS_Browser/releases)__ | __[Changelog](https://codeberg.org/Gaukler_Faun/FOSS_Browser/src/branch/master/CHANGELOG.md)__ | __[ISSUES](https://codeberg.org/Gaukler_Faun/FOSS_Browser/issues)__ | __[Privacy](https://codeberg.org/Gaukler_Faun/FOSS_Browser/src/branch/master/PRIVACY.md)__ | __[License](https://codeberg.org/Gaukler_Faun/FOSS_Browser/src/branch/master/LICENSE.md)__ | __[Code of conduct](https://codeberg.org/Gaukler_Faun/FOSS_Browser/src/branch/master/CODE_OF_CONDUCT.md)__ | __[Help translating](https://translate.codeberg.org/projects/foss-browser/)__
+## ✨ Features & Highlights
 
-----
+### 🎨 Material 3 Expressive & Stride UI
+- **AMOLED & Dark Surface Container Tinting**: Deep dark mode support (`28dp` rounded corners) optimized for OLED screens.
+- **Chrome & Cromite Style Omnibox**: Responsive address bar with security lock status badges, domain highlighting, and instant site fast-toggles.
+- **Scroll-Linked Address Bar Collapse**: On scroll down, the full address bar smoothly animates out of view and is replaced by a small circular floating action bubble (`fab_bubble`) positioned at bottom-right with spring physics (`OvershootInterpolator`).
+- **Spring-Physics Micro-Animations**: Tactile squishy press feedback on buttons (`bouncyClickable`) matching Stride Motion design guidelines.
 
-FOSS Browser is an Android application to browse through the internet. It uses the Android webview to render websites and has no advanced render engine like  normal  browsers.
+### ⚡ Lightning Fast & Lag-Free
+- **Async AdBlock Engine**: Asynchronous host loading off the main UI thread ensures zero delay when creating new tabs or loading pages.
+- **60fps Tab Selector Overview**: Chrome-inspired 2-column live tab switcher grid with instant tab switching and smooth closing controls.
+- **Zero-Lag Instant Popup Menu**: High-performance 270dp `PopupWindow` with window dimming and quick-action tool shortcuts.
 
-----
+### 🛡️ Privacy & Security First
+- **Built-in Ad & Tracker Shield**: Automatic blocking of web ads and trackers using updated host lists.
+- **Default Search Engine Chooser**: Custom onboarding modal & settings sheet to select your preferred search provider (Google, DuckDuckGo, Startpage, Brave, SearXNG, Bing, Qwant, Ecosia).
+- **Chrome-Inspired History Page**: Integrated search & filter for visited sites, clear browsing data shortcut, and single-tap history entry deletion.
+- **Zero Data Collection**: No telemetry, tracking, or remote data analytics.
 
-### Privacy
+### 📦 Inbuilt Download Manager
+- Integrated Jetpack Compose Download Manager with real-time progress bars, pausing, resuming, and direct file opening.
 
-FOSS Browser can save settings fot each domain to protect your privacy. For each domain you can enable or disable: AdBlock, JavaScript, cookies, fingerprint protection and much more. For non saved domains you can edit a standard profile to your needs.
+---
 
-_More privacy features:_
+## 🛠️ Build & Installation
 
-- Built-in AdBlock, which updates automatically. You can decide which content to block. AdBlock hosts are taken from [Steven Black - AdBlock hosts](https://github.com/StevenBlack/hosts).
-- Third-party cookies can be disabled.
-- block cookie banners
-- Enable or disable Android-autofill.
-- Delete browser data (on app exit).
-- Choose between different search engines (or set a custom one).
-- FOSS Browser itself doesn't collect any data: [Privacy policy](https://codeberg.org/Gaukler_Faun/FOSS_Browser/src/branch/master/PRIVACY.md)
+### Requirements
+- **Android SDK**: API 26+ (Android 8.0 Oreo or higher)
+- **Target SDK**: API 34+ (Android 14)
+- **Gradle**: 8.0+ / AGP 8.0+
 
+### Building APK via Command Line
+```bash
+./gradlew assembleDebug
+```
 
-----
-### UI/Handling
+---
 
-FOSS Browser uses the latest Material You design libraries. Following system day/night mode and a wallpaper based theme are just two features of this new library. The UI is optimized for one-hand-use. All UI-elements are at the bottom of the screen.
-
-
-_More features:_
-
-- Keep screen on.
-- Open links in background.
-- Restore tabs on restart.
-
-----
-### Bookmarks filter
-
-Organize your bookmarks with filters. You can set custom names for each filter. Long press the bookmark icon in the toolbar to get fast access to your favorite bookmarks.
-
-----
-### Gestures
-
-You can assign nearly twenty different gestures to the toolbar and the toolbar buttons. Each in four directions. You can also trigger events by long pressing the toolbar buttons. So you have up to ten different gestures to control FOSS Browser. Supported is for example: load last website, switch tab, reload, open bookmarks, ... and many more.
-
-----
-### Backups
-
-Backup all your important data and settings (bookmarks, history, websites-settings and so on) on your SD-card. You can also back up FOSS Browser settings. Backups can even be restored on a fresh install or another device (if you copy the backup files to the new device).
-
-----
-
-[<img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="50"/>](https://f-droid.org/packages/de.baumann.browser/)
-[<img src="https://www.paypalobjects.com/de_DE/DE/i/btn/btn_donateCC_LG.gif" alt="Donate" height="50"/>](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=NP6TGYDYP9SHY)
+## 📄 License
+Licensed under GNU General Public License v3.0 (GPL-3.0).

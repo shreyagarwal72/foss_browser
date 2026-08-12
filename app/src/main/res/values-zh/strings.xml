@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">FOSS 浏览器</string>
+    <string name="app_name">Petal 浏览器</string>
     <string name="app_ok">确定</string>
     <string name="app_help">帮助</string>
     <string name="app_cancel">取消</string>
@@ -109,7 +109,7 @@
     <string name="toast_input_empty">请输入一些内容。</string>
     <string name="toast_webview_forward">无法加载下一个网站。</string>
     <string name="toast_restart">是否重启以应用更改？</string>
-    <string name="toast_quit">是否退出“FOSS 浏览器”？</string>
+    <string name="toast_quit">是否退出“Petal 浏览器”？</string>
     <string name="toast_quit_TAB">是否关闭标签页？</string>
     <string name="toast_unsecured">网站使用不安全的连接（“http”）。是否尝试安全的连接（“https”）？</string>
     <string name="toast_backup">是否备份数据？这将覆盖现有备份。</string>
@@ -120,8 +120,8 @@
     <string name="menu_nightView">深色模式</string>
     <string name="setting_title_camera">允许使用相机</string>
     <string name="setting_title_microphone">允许使用麦克风</string>
-    <string name="setting_summary_tabsReload">启动 FOSS 浏览器时，重新加载上次打开的标签页。</string>
-    <string name="setting_summary_tabsRestore">当 FOSS 浏览器被系统终止时，恢复标签页。</string>
+    <string name="setting_summary_tabsReload">启动 Petal 浏览器时，重新加载上次打开的标签页。</string>
+    <string name="setting_summary_tabsRestore">当 Petal 浏览器被系统终止时，恢复标签页。</string>
     <string name="hint_DRM_Media">是否允许播放受 DRM 保护的媒体？</string>
     <string name="menu_reload">重新加载</string>
     <string name="menu_restart">重启并重新加载标签页</string>
@@ -133,8 +133,8 @@
     <string name="title_appDatabase">数据库</string>
     <string name="app_error_save">已保存。</string>
     <string name="menu_shareOpenWith">打开方式…</string>
-    <string name="app_intro_b">当前打开的网站是 FOSS 浏览器的维基页面。该网站也保存为您的第一个书签。在维基上，您可以找到有用的提示和链接。</string>
-    <string name="app_intro_a">感谢您使用 FOSS 浏览器！</string>
+    <string name="app_intro_b">当前打开的网站是 Petal 浏览器的维基页面。该网站也保存为您的第一个书签。在维基上，您可以找到有用的提示和链接。</string>
+    <string name="app_intro_a">感谢您使用 Petal 浏览器！</string>
     <string name="setting_title_deny_cookie_banners">Cookie 横幅广告拦截器</string>
     <string name="dialog_sortDomain">按域名排序</string>
     <string name="dialog_tracking">可能的跟踪网址。移除跟踪部分：</string>

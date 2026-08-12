@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Navegador FOSS</string>
+    <string name="app_name">Navegador Petal</string>
     <string name="app_ok">Ok</string>
     <string name="app_help">Ayuda</string>
     <string name="app_cancel">Cancelar</string>
@@ -108,7 +108,7 @@
     <string name="toast_input_empty">Por favor, introduzca algo.</string>
     <string name="toast_webview_forward">No se puede cargar la página siguiente.</string>
     <string name="toast_restart">¿Reiniciar para aplicar los cambios?</string>
-    <string name="toast_quit">¿Salir del \"Navegador FOSS\"?</string>
+    <string name="toast_quit">¿Salir del \"Navegador Petal\"?</string>
     <string name="toast_quit_TAB">¿Cerrar la pestaña?</string>
     <string name="toast_unsecured">La página web utiliza una conexión no segura (\"http\"). ¿Prueba con una conexión segura (\"https\")?</string>
     <string name="toast_backup">¿Datos de la copia de seguridad\? Esto sobrescribirá la copia de seguridad existente.</string>
@@ -119,8 +119,8 @@
     <string name="menu_nightView">Vista nocturna</string>
     <string name="setting_title_camera">Permitir uso de cámara</string>
     <string name="setting_title_microphone">Permitir el uso del micrófono</string>
-    <string name="setting_summary_tabsReload">Recarga de las últimas pestañas abiertas, al iniciar el navegador FOSS.</string>
-    <string name="setting_summary_tabsRestore">Restaurar pestañas, cuando el navegador FOSS es eliminado por el sistema.</string>
+    <string name="setting_summary_tabsReload">Recarga de las últimas pestañas abiertas, al iniciar el navegador Petal.</string>
+    <string name="setting_summary_tabsRestore">Restaurar pestañas, cuando el navegador Petal es eliminado por el sistema.</string>
     <string name="hint_DRM_Media">¿Desea permitir reproducción multimedia protegida por DRM?</string>
     <string name="menu_reload">Recargar</string>
     <string name="menu_restart">Reiniciar y recargar pestañas</string>

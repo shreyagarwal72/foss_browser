@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">FOSS Preglednik</string>
+    <string name="app_name">Petal Preglednik</string>
     <string name="app_ok">Uredu</string>
     <string name="app_help">Pomoć</string>
     <string name="app_cancel">Otkaži</string>
@@ -106,8 +106,8 @@
     <string name="settings_data_restore">Obnoviti</string>
     <string name="toast_input_empty">Niste ništa unijeli.</string>
     <string name="toast_webview_forward">Nije moguće učitati sljedeću stranicu</string>
-    <string name="toast_restart">Morate ponovo pokrenuti \"FOSS Preglednik\" da biste primijenili promjene. Zatvoriti sada?</string>
-    <string name="toast_quit">Da li želite zatvoriti \"FOSS Preglednik\"?</string>
+    <string name="toast_restart">Morate ponovo pokrenuti \"Petal Preglednik\" da biste primijenili promjene. Zatvoriti sada?</string>
+    <string name="toast_quit">Da li želite zatvoriti \"Petal Preglednik\"?</string>
     <string name="toast_quit_TAB">Želite li zatvoriti KARTICU?</string>
     <string name="toast_unsecured">Web stranica koristi nezaštićenu vezu (\"http\"). Želite li isprobati sigurnu vezu (\"https\")?</string>
     <string name="toast_backup">Sigurnosno kopirajte podatke\? Ovo će prepisati staru sigurnosnu kopiju.</string>
@@ -118,8 +118,8 @@
     <string name="menu_nightView">Noćni prikaz</string>
     <string name="setting_title_camera">Dozvolite korištenje kamere</string>
     <string name="setting_title_microphone">Dozvolite korištenje mikrofona</string>
-    <string name="setting_summary_tabsReload">Ponovo učitajte posljednje otvorene kartice, kada pokrenete FOSS Preglednik.</string>
-    <string name="setting_summary_tabsRestore">Obnovite kartice, kada sistem prisilno zaustavi FOSS Preglednik.</string>
+    <string name="setting_summary_tabsReload">Ponovo učitajte posljednje otvorene kartice, kada pokrenete Petal Preglednik.</string>
+    <string name="setting_summary_tabsRestore">Obnovite kartice, kada sistem prisilno zaustavi Petal Preglednik.</string>
     <string name="hint_DRM_Media">Dozvoliti DRM zaštićenu reprodukciju medija?</string>
     <string name="menu_reload">Osvježi</string>
     <string name="menu_restart">Ponovo pokrenite i učitajte kartice</string>

@@ -134,7 +134,7 @@
     <string name="app_error_save">Již uloženo.</string>
     <string name="menu_shareOpenWith">Otevřete s …</string>
     <string name="app_intro_a">Děkujeme, že používáte Petal!</string>
-    <string name="app_intro_b">Aktuálně otevřená webová stránka je WIKI prohlížeče FOSS. Tato stránka je také uložena jako první záložka. Na WIKI najdete užitečné tipy a odkazy.</string>
+    <string name="app_intro_b">Aktuálně otevřená webová stránka je WIKI prohlížeče Petal. Tato stránka je také uložena jako první záložka. Na WIKI najdete užitečné tipy a odkazy.</string>
     <string name="setting_title_deny_cookie_banners">Blokátor bannerů cookie</string>
     <string name="dialog_sortDomain">Třídit podle domény</string>
     <string name="dialog_tracking">Možná adresa URL pro sledování. Odstranění sledovací části:</string>

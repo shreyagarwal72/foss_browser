@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">FOSS-browser</string>
+    <string name="app_name">Petal-browser</string>
     <string name="app_ok">Oké</string>
     <string name="app_help">Hulp</string>
     <string name="app_cancel">Annuleren</string>
@@ -108,8 +108,8 @@
     <string name="settings_data_restore">Herstellen</string>
     <string name="toast_input_empty">Je hebt niks ingevoerd.</string>
     <string name="toast_webview_forward">Volgende site kan niet worden geladen</string>
-    <string name="toast_restart">\"FOSS-browser\" moet worden herstart om de wijzigingen toe te passen. Wil je nu afsluiten?</string>
-    <string name="toast_quit">Wil je \"FOSS-browser\" afsluiten?</string>
+    <string name="toast_restart">\"Petal-browser\" moet worden herstart om de wijzigingen toe te passen. Wil je nu afsluiten?</string>
+    <string name="toast_quit">Wil je \"Petal-browser\" afsluiten?</string>
     <string name="toast_quit_TAB">Wilt u de TAB sluiten?</string>
     <string name="toast_unsecured">Deze website gebruikt een onbeveiligde verbinding (\"http\"). Wilt u een beveiligde verbinding (\"https\") proberen?</string>
     <string name="toast_backup">Back-up gegevens\? Dit overschrijft de bestaande back-up.</string>
@@ -120,7 +120,7 @@
     <string name="menu_nightView">Nacht-weergave</string>
     <string name="setting_title_camera">Camera-gebruik toestaan</string>
     <string name="setting_title_microphone">Microfoon-gebruik toestaan</string>
-    <string name="setting_summary_tabsReload">Herlaad laatst geopende tabbladen, bij het starten van de FOSS-browser.</string>
+    <string name="setting_summary_tabsReload">Herlaad laatst geopende tabbladen, bij het starten van de Petal-browser.</string>
     <string name="setting_summary_tabsRestore">Tabbladen herstellen wanneer de Petal wordt gedood door het systeem.</string>
     <string name="hint_DRM_Media">DRM-beschermde media weergeven?</string>
     <string name="menu_reload">Herladen</string>

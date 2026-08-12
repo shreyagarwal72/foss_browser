@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">مرورگر FOSS</string>
+    <string name="app_name">مرورگر Petal</string>
     <string name="app_ok">تایید</string>
     <string name="app_help">راهنما</string>
     <string name="app_cancel">لغو</string>
@@ -154,6 +154,6 @@
     <string name="title_appDatabase">پایگاه داده</string>
     <string name="setting_menu">منو</string>
     <string name="menu_delete_entry">حذف ورودی</string>
-    <string name="app_intro_a">از اینکه از مرورگر FOSS استفاده می‌کنید، سپاسگزاریم!</string>
-    <string name="app_intro_b">وب‌سایت فعلی که باز است، ویکی مرورگر FOSS است. این سایت همچنین به‌عنوان اولین نشانک شما ذخیره شده است. در ویکی می‌توانید نکات و پیوندهای مفیدی را بیابید.</string>
+    <string name="app_intro_a">از اینکه از مرورگر Petal استفاده می‌کنید، سپاسگزاریم!</string>
+    <string name="app_intro_b">وب‌سایت فعلی که باز است، ویکی مرورگر Petal است. این سایت همچنین به‌عنوان اولین نشانک شما ذخیره شده است. در ویکی می‌توانید نکات و پیوندهای مفیدی را بیابید.</string>
 </resources>

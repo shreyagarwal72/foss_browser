@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Trình duyệt FOSS</string>
+    <string name="app_name">Trình duyệt Petal</string>
     <string name="app_ok">OK</string>
     <string name="app_help">Trợ giúp</string>
     <string name="app_cancel">Hủy</string>
@@ -107,8 +107,8 @@
     <string name="settings_data_restore">Khôi phục</string>
     <string name="toast_input_empty">Bạn chưa nhập gì cả.</string>
     <string name="toast_webview_forward">Không thể tải trang tiếp theo</string>
-    <string name="toast_restart">Bạn phải khởi động lại \"Trình duyệt FOSS\" để áp dụng các thay đổi. Đóng ngay?</string>
-    <string name="toast_quit">Bạn có muốn thoát \"Trình duyệt FOSS\" không?</string>
+    <string name="toast_restart">Bạn phải khởi động lại \"Trình duyệt Petal\" để áp dụng các thay đổi. Đóng ngay?</string>
+    <string name="toast_quit">Bạn có muốn thoát \"Trình duyệt Petal\" không?</string>
     <string name="toast_quit_TAB">Bạn có muốn đóng TAB không?</string>
     <string name="toast_unsecured">Trang web sử dụng kết nối không bảo mật (\"http\"). Thử kết nối bảo mật (\"https\")?</string>
     <string name="toast_backup">Sao lưu dữ liệu\? Việc này sẽ ghi đè lên bản sao lưu cũ.</string>
@@ -119,8 +119,8 @@
     <string name="menu_nightView">viễn cảnh buổi đêm</string>
     <string name="setting_title_camera">Cho phép sử dụng máy ảnh</string>
     <string name="setting_title_microphone">Cho phép sử dụng micro</string>
-    <string name="setting_summary_tabsReload">Tải lại các tab đã mở lần cuối, khi khởi động Trình duyệt FOSS.</string>
-    <string name="setting_summary_tabsRestore">Khôi phục các tab, khi Trình duyệt FOSS bị hệ thống dừng.</string>
+    <string name="setting_summary_tabsReload">Tải lại các tab đã mở lần cuối, khi khởi động Trình duyệt Petal.</string>
+    <string name="setting_summary_tabsRestore">Khôi phục các tab, khi Trình duyệt Petal bị hệ thống dừng.</string>
     <string name="hint_DRM_Media">Cho phép phát phương tiện có DRM bảo vệ?</string>
     <string name="menu_reload">Tải lại</string>
     <string name="menu_restart">Khởi động lại và tải lại các tab</string>

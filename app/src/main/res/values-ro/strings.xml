@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Browserul FOSS</string>
+    <string name="app_name">Browserul Petal</string>
     <string name="app_ok">Bine</string>
     <string name="app_help">Ajutor</string>
     <string name="app_cancel">Anulează</string>
@@ -109,7 +109,7 @@
     <string name="toast_input_empty">Nu ai introdus nimic.</string>
     <string name="toast_webview_forward">Nu se poate încărca următorul site</string>
     <string name="toast_restart">Trebuie să repornești \"Petal\" pentru a aplica modificările. Închizi acum?</string>
-    <string name="toast_quit">Dorești să închizi „Browser-ul FOSS”?</string>
+    <string name="toast_quit">Dorești să închizi „Browser-ul Petal”?</string>
     <string name="toast_quit_TAB">Vrei să închizi FILA?</string>
     <string name="toast_unsecured">Site-ul folosește o conexiune nesecurizată („http”). Încerci o conexiune securizată („https”)?</string>
     <string name="toast_backup">Date de rezervă\? Aceasta va suprascrie copia de rezervă existentă.</string>
@@ -120,8 +120,8 @@
     <string name="menu_nightView">Vizualizare nocturnă</string>
     <string name="setting_title_camera">Permite utilizarea camerei</string>
     <string name="setting_title_microphone">Permite utilizarea microfonului</string>
-    <string name="setting_summary_tabsReload">Reîncarcă ultimele file deschise, la pornirea browser-ului FOSS.</string>
-    <string name="setting_summary_tabsRestore">Restaurează filele, când browser-ul FOSS este oprit de sistem.</string>
+    <string name="setting_summary_tabsReload">Reîncarcă ultimele file deschise, la pornirea browser-ului Petal.</string>
+    <string name="setting_summary_tabsRestore">Restaurează filele, când browser-ul Petal este oprit de sistem.</string>
     <string name="hint_DRM_Media">Permiți redarea conținutului media protejat DRM?</string>
     <string name="menu_reload">Reîncărcare</string>
     <string name="menu_restart">Repornește și reîncarcă filele</string>

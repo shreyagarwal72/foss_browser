@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">FOSS претраживач</string>
+    <string name="app_name">Petal претраживач</string>
     <string name="app_ok">У реду</string>
     <string name="app_help">Помоћ</string>
     <string name="app_cancel">Откажи</string>
@@ -155,5 +155,5 @@
     <string name="setting_menu">Мени</string>
     <string name="menu_delete_entry">Избриши унос</string>
     <string name="app_intro_a">Хвала што користите Petal!</string>
-    <string name="app_intro_b">Тренутно отворена веб-страница је WIKI прегледача FOSS. Ова страница је такође сачувана као ваша прва ознака. На WIKI-ју можете пронаћи корисне савете и линкове.</string>
+    <string name="app_intro_b">Тренутно отворена веб-страница је WIKI прегледача Petal. Ова страница је такође сачувана као ваша прва ознака. На WIKI-ју можете пронаћи корисне савете и линкове.</string>
 </resources>

@@ -3,7 +3,7 @@
     <string name="app_never">Mitte kunagi</string>
     <string name="app_always">Alati</string>
     <string name="app_session">… selles sessioonis?</string>
-    <string name="app_name">FOSS Brauser</string>
+    <string name="app_name">Petal Brauser</string>
     <string name="app_ok">Sobib</string>
     <string name="app_no">Ei</string>
     <string name="app_help">Abiteave</string>
@@ -83,7 +83,7 @@
     <string name="setting_gesture_up">Viipamine üles</string>
     <string name="menu_restart">Käivita rakendus ja laadi vahekaardid uuesti</string>
     <string name="setting_title_screenOn">Hoia ekraan sisselülitatuna</string>
-    <string name="app_intro_a">Suur tänu, et kasutad FOSS Brauserit!</string>
+    <string name="app_intro_a">Suur tänu, et kasutad Petal Brauserit!</string>
     <string name="source">Lähtekood</string>
     <string name="setting_title_profiles_standard">Standardprofiil</string>
     <string name="setting_title_profiles_standard_always">Kasuta uute domeenide ja vahekaartide puhul standardprofiili.</string>
@@ -129,7 +129,7 @@
     <string name="settings_data_restore">Taasta</string>
     <string name="toast_input_empty">Palun sisesta midagi.</string>
     <string name="toast_webview_forward">Järgmist veebisaiti ei õnnestu laadida.</string>
-    <string name="toast_quit">Kas sulgeme FOSS Brauseri?</string>
+    <string name="toast_quit">Kas sulgeme Petal Brauseri?</string>
     <string name="toast_quit_TAB">Kas sulgeme vahekaardi?</string>
     <string name="toast_backup">Kas varundame andmed? See kirjutab eelmise varukoopia üle.</string>
     <string name="dialog_postOnWebsiteHint">Avatav võrguadress. Saab olema salvestatud järgmiseks kasutuskorraks.</string>
@@ -137,7 +137,7 @@
     <string name="menu_desktopView">Töölauavaade</string>
     <string name="menu_dayView">Päevavaade</string>
     <string name="menu_nightView">Öövaade</string>
-    <string name="setting_summary_tabsReload">FOSS Brauseri käivitamisel taasta viimatikasutatud vahekaardid.</string>
+    <string name="setting_summary_tabsReload">Petal Brauseri käivitamisel taasta viimatikasutatud vahekaardid.</string>
     <string name="hint_DRM_Media">Kas lubad DRM-iga kaitstud meedia esitamist?</string>
     <string name="setting_title_profiles_privacy">Privaatsus</string>
     <string name="setting_title_save_data">Küsi luba andmete salvestamiseks</string>
@@ -150,8 +150,8 @@
     <string name="setting_gesture_04">Keri lehe ülemisse äärde</string>
     <string name="setting_title_microphone">Luba kasutada mikrofoni</string>
     <string name="setting_gesture_07">Näita parempoolset vahekaarti</string>
-    <string name="setting_summary_tabsRestore">Taasta vahekaardid, kui operatsioonisüsteem lõpetab FOSS Brauseri töö.</string>
-    <string name="app_intro_b">Hetkel avatud veebisait on FOSS Brauseri viki. Ta on lisatud ka esimese järjehoidjana. Vikist leiad juhendeid, kasulikku teavet ja asjakohaseid linke.</string>
+    <string name="setting_summary_tabsRestore">Taasta vahekaardid, kui operatsioonisüsteem lõpetab Petal Brauseri töö.</string>
+    <string name="app_intro_b">Hetkel avatud veebisait on Petal Brauseri viki. Ta on lisatud ka esimese järjehoidjana. Vikist leiad juhendeid, kasulikku teavet ja asjakohaseid linke.</string>
     <string name="menu_reload">Laadi uuesti</string>
     <string name="app_restart">Uuesti käivitamisel</string>
     <string name="setting_menu">Menüü</string>

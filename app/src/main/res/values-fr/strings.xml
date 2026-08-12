@@ -133,7 +133,7 @@
     <string name="title_appDatabase">Base de données</string>
     <string name="app_error_save">Déjà sauvegardé.</string>
     <string name="menu_shareOpenWith">Ouvrir avec …</string>
-    <string name="app_intro_b">Le site web actuellement ouvert est le WIKI du navigateur FOSS. Ce site est également enregistré comme votre premier signet. Sur le WIKI, vous trouverez des conseils et des liens utiles.</string>
+    <string name="app_intro_b">Le site web actuellement ouvert est le WIKI du navigateur Petal. Ce site est également enregistré comme votre premier signet. Sur le WIKI, vous trouverez des conseils et des liens utiles.</string>
     <string name="app_intro_a">Merci d\'utiliser Petal!</string>
     <string name="setting_title_deny_cookie_banners">Bloqueur de bannières de cookies</string>
     <string name="dialog_sortDomain">Trier par domaine</string>

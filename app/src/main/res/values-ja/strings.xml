@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">FOSSブラウザ</string>
+    <string name="app_name">Petalブラウザ</string>
     <string name="app_ok">OK</string>
     <string name="app_help">ヘルプ</string>
     <string name="app_cancel">中止</string>
