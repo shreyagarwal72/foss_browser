@@ -458,24 +458,13 @@ public class NinjaWebViewClient extends WebViewClient {
     public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
         final Uri uri = request.getUrl();
         String url = uri.toString();
-        if (url.startsWith("http:") || url.startsWith("https:")) {
-            //view.loadUrl(url);
-            String mCurrentUrl = sp.getString("mCurrentUrl", "");
-            if(url.equals(mCurrentUrl) && sp.getBoolean("backPressed", false)) {
-                String historyUrl="";
-                WebBackForwardList mWebBackForwardList = view.copyBackForwardList();
-                if (mWebBackForwardList.getCurrentIndex() > 0) historyUrl = mWebBackForwardList.getItemAtIndex(mWebBackForwardList.getCurrentIndex()-1).getUrl();
-                view.loadUrl(historyUrl);
-                sp.edit().putString("mCurrentUrl", "").apply();
-                sp.edit().putBoolean("backPressed", false).apply();
-            } else {
-                view.loadUrl(url);
-            }
+        if (url.startsWith("http:") || url.startsWith("https:") || url.startsWith("file:") || url.startsWith("about:")) {
             return false;
-        } else  {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(url));
-            context.startActivity(Intent.createChooser(intent, url));
+        } else {
+            try {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                context.startActivity(Intent.createChooser(intent, url));
+            } catch (Exception ignored) {}
             return true;
         }
     }
