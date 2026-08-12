@@ -878,8 +878,8 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
         if (item_cardView != null) {
             item_cardView.setOnClickListener(v -> {
                 String currentUrl = ninjaWebView != null ? ninjaWebView.getUrl() : "";
-                if (currentUrl != null && !currentUrl.isEmpty() && !currentUrl.startsWith("file:///android_asset/")) {
-                    showDialogFastToggle(HelperUnit.domain(currentUrl), currentUrl, item_cardView);
+                if (currentUrl != null && !currentUrl.isEmpty() && !currentUrl.startsWith("file:///android_asset/") && fab_menu != null) {
+                    showDialogFastToggle(HelperUnit.domain(currentUrl), currentUrl, fab_menu);
                 }
             });
         }
