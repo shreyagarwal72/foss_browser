@@ -61,7 +61,7 @@ object PetalDownloadBridge {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun PetalDownloadManagerScreen(onBackPress: () -> Unit = {}) {
     val context = LocalContext.current
@@ -139,6 +139,29 @@ fun PetalDownloadManagerScreen(onBackPress: () -> Unit = {}) {
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
+@Composable
+fun PlayStoreDownloadProgress(progress: Float?) {
+    if (progress != null && progress in 0f..1f) {
+        val animatedProgress by animateFloatAsState(
+            targetValue = progress,
+            animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
+            label = "PlayStoreProgress"
+        )
+        CircularWavyProgressIndicator(
+            progress = { animatedProgress },
+            modifier = Modifier.size(36.dp),
+            strokeWidth = 3.dp
+        )
+    } else {
+        CircularWavyProgressIndicator(
+            modifier = Modifier.size(36.dp),
+            strokeWidth = 3.dp
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun DownloadCardItem(item: DownloadItem, onOpenFile: () -> Unit) {
     Surface(
@@ -186,6 +209,8 @@ private fun DownloadCardItem(item: DownloadItem, onOpenFile: () -> Unit) {
                     IconButton(onClick = onOpenFile) {
                         Icon(Icons.Rounded.OpenInNew, contentDescription = "Open file", tint = MaterialTheme.colorScheme.primary)
                     }
+                } else if (item.status == DownloadManager.STATUS_RUNNING || item.status == DownloadManager.STATUS_PENDING) {
+                    PlayStoreDownloadProgress(progress = item.progress)
                 }
             }
 

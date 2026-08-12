@@ -178,7 +178,7 @@ fun PetalHistoryScreen(
                     }
                 },
                 actions = {
-                    if (rawHistory.isNotEmpty()) {
+                    if (rawHistory?.isNotEmpty() == true) {
                         IconButton(onClick = { showClearConfirm = true }) {
                             Icon(
                                 Icons.Rounded.DeleteSweep,
@@ -325,7 +325,7 @@ fun PetalHistoryScreen(
                                     action.open(true)
                                     action.deleteURL(record.url, RecordUnit.TABLE_HISTORY)
                                     action.close()
-                                    rawHistory = rawHistory.filter { it.url != record.url }
+                                    rawHistory = rawHistory?.filter { it.url != record.url } ?: emptyList()
                                 } catch (e: Exception) {
                                     e.printStackTrace()
                                 }
