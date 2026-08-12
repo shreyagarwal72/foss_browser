@@ -19,6 +19,7 @@ import android.os.Environment;
 import android.provider.Settings;
 import android.util.Log;
 import android.webkit.CookieManager;
+import android.webkit.WebSettings;
 import android.webkit.WebStorage;
 import android.webkit.WebView;
 import android.widget.Toast;
@@ -166,17 +167,25 @@ public class BrowserUnit {
         if (hasPermission) {
             try {
                 DownloadManager.Request request = new DownloadManager.Request(Uri.parse(verifiedUrl));
+                String userAgent = WebSettings.getDefaultUserAgent(context);
+                if (userAgent != null && !userAgent.isEmpty()) {
+                    request.addRequestHeader("User-Agent", userAgent);
+                }
                 CookieManager cookieManager = CookieManager.getInstance();
                 String cookie = cookieManager.getCookie(verifiedUrl);
                 if (cookie != null) {
                     request.addRequestHeader("Cookie", cookie);
                 }
-                request.addRequestHeader("Accept", "text/html, application/xhtml+xml, */*");
+                request.addRequestHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8");
                 request.addRequestHeader("Accept-Language", Locale.getDefault().toLanguageTag());
                 request.addRequestHeader("Referer", verifiedUrl);
+                request.setAllowedOverMetered(true);
+                request.setAllowedOverRoaming(true);
                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                 request.setTitle(fileName);
-                request.setMimeType(mimeType);
+                if (mimeType != null && !mimeType.isEmpty()) {
+                    request.setMimeType(mimeType);
+                }
                 request.allowScanningByMediaScanner();
                 request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
                 DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);

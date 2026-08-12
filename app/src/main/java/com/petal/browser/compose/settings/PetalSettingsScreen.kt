@@ -32,7 +32,7 @@ import androidx.activity.ComponentActivity
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.petal.browser.ui.components.IconSwitch
-import com.petal.browser.ui.components.PetalSearchEngineSheet
+import com.petal.browser.ui.components.PetalSearchEngineSheetContent
 import com.petal.browser.ui.components.availableSearchEngines
 import com.petal.browser.ui.components.StrideSlider
 import com.petal.browser.ui.theme.PetalExpressiveTheme
@@ -45,7 +45,9 @@ object PetalSettingsBridge {
             setViewTreeSavedStateRegistryOwner(activity)
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                PetalSettingsScreen(onBackPress = onBackPress)
+                PetalExpressiveTheme {
+                    PetalSettingsScreen(onBackPress = onBackPress)
+                }
             }
         }
     }
@@ -69,13 +71,19 @@ fun PetalSettingsScreen(onBackPress: () -> Unit = {}) {
     var showEngineSheet by remember { mutableStateOf(false) }
 
     if (showEngineSheet) {
-        PetalSearchEngineSheet(
-            onSelectEngine = { idx ->
-                searchEngineIndex = idx.toString()
-                showEngineSheet = false
-            },
-            onDismiss = { showEngineSheet = false }
-        )
+        ModalBottomSheet(
+            onDismissRequest = { showEngineSheet = false },
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+        ) {
+            PetalSearchEngineSheetContent(
+                onConfirm = { idx ->
+                    sp.edit().putString("sp_search_engine", idx.toString()).apply()
+                    searchEngineIndex = idx.toString()
+                    showEngineSheet = false
+                },
+                onCancel = { showEngineSheet = false }
+            )
+        }
     }
 
     PetalExpressiveTheme(

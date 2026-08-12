@@ -206,7 +206,13 @@ private fun DownloadCardItem(item: DownloadItem, onOpenFile: () -> Unit) {
     Surface(
         shape = RoundedCornerShape(20.dp),
         color = MaterialTheme.colorScheme.surfaceContainerHigh,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(
+                if (item.status == DownloadManager.STATUS_SUCCESSFUL) {
+                    Modifier.clickable(onClick = onOpenFile)
+                } else Modifier
+            )
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -245,8 +251,18 @@ private fun DownloadCardItem(item: DownloadItem, onOpenFile: () -> Unit) {
                 }
 
                 if (item.status == DownloadManager.STATUS_SUCCESSFUL) {
-                    IconButton(onClick = onOpenFile) {
-                        Icon(Icons.Rounded.OpenInNew, contentDescription = "Open file", tint = MaterialTheme.colorScheme.primary)
+                    Button(
+                        onClick = onOpenFile,
+                        shape = RoundedCornerShape(12.dp),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        Icon(
+                            Icons.Rounded.OpenInNew,
+                            contentDescription = "Open file",
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text("Open", style = MaterialTheme.typography.labelMedium)
                     }
                 } else if (item.status == DownloadManager.STATUS_RUNNING || item.status == DownloadManager.STATUS_PENDING) {
                     PlayStoreDownloadProgress(progress = item.progress)
@@ -334,14 +350,40 @@ private fun getDownloadItems(
 
 private fun openDownloadedFile(context: Context, item: DownloadItem) {
     try {
-        if (item.localUri != null) {
-            val intent = Intent(Intent.ACTION_VIEW).apply {
-                setDataAndType(Uri.parse(item.localUri), "*/*")
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        val uri = if (item.localUri != null) Uri.parse(item.localUri) else null
+        if (uri != null) {
+            val contentResolver = context.contentResolver
+            var mimeType = contentResolver.getType(uri)
+            if (mimeType.isNullOrEmpty()) {
+                val extension = android.webkit.MimeTypeMap.getFileExtensionFromUrl(uri.toString())
+                if (!extension.isNullOrEmpty()) {
+                    mimeType = android.webkit.MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension.lowercase())
+                }
             }
-            context.startActivity(intent)
+            if (mimeType.isNullOrEmpty()) mimeType = "*/*"
+
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, mimeType)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            }
+            val chooser = Intent.createChooser(intent, "Open file with")
+            chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(chooser)
+        } else {
+            val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            val fileUri = dm.getUriForDownloadedFile(item.id)
+            if (fileUri != null) {
+                val intent = Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(fileUri, "*/*")
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+                context.startActivity(Intent.createChooser(intent, "Open file with"))
+            }
         }
     } catch (e: Exception) {
-        e.printStackTrace()
+        try {
+            val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            dm.openDownloadedFile(item.id)
+        } catch (ignored: Exception) {}
     }
 }

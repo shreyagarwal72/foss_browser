@@ -293,12 +293,18 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
         BroadcastReceiver downloadReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                String text = getString(R.string.app_done) + ". " + getString(R.string.menu_download) +"?";
-                Snackbar snackbar = Snackbar.make(ninjaWebView, text, Snackbar.LENGTH_SHORT);
-                HelperUnit.makeSnackbarRound(snackbar);
-                snackbar.setAction(context.getString(R.string.app_ok), v -> showDownloads());
-                snackbar.show();
-            }};
+                try {
+                    String text = getString(R.string.app_done) + ". " + getString(R.string.menu_download) + "?";
+                    View anchor = contentFrame != null ? contentFrame : getWindow().getDecorView();
+                    Snackbar snackbar = Snackbar.make(anchor, text, Snackbar.LENGTH_LONG);
+                    HelperUnit.makeSnackbarRound(snackbar);
+                    snackbar.setAction(context.getString(R.string.app_ok), v -> showDownloads());
+                    snackbar.show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
 
         if (SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(downloadReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE), RECEIVER_EXPORTED);

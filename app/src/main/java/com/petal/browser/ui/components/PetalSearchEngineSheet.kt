@@ -1,8 +1,8 @@
 /*
  * PetalSearchEngineSheet.kt
  * ─────────────────────────────────────────────────────────────────────────
- * Material 3 Search Engine Selection Modal & Preference Sheet for Petal Browser.
- * Prompts user on first startup and allows switching default search engines anytime in Settings.
+ * Material 3 Search Engine Selection Modal Sheet for Petal Browser.
+ * Zero-lag single BottomSheetDialog with clear radio selections and explicit Confirm action.
  */
 
 package com.petal.browser.ui.components
@@ -65,8 +65,8 @@ object PetalSearchEngineBridge {
                 setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                 setContent {
                     PetalExpressiveTheme {
-                        PetalSearchEngineSheet(
-                            onSelectEngine = { index ->
+                        PetalSearchEngineSheetContent(
+                            onConfirm = { index ->
                                 val sp = PreferenceManager.getDefaultSharedPreferences(activity)
                                 sp.edit()
                                     .putString("sp_search_engine", index.toString())
@@ -75,7 +75,7 @@ object PetalSearchEngineBridge {
                                 try { dialog.dismiss() } catch (ignored: Exception) {}
                                 onDismiss?.run()
                             },
-                            onDismiss = {
+                            onCancel = {
                                 try { dialog.dismiss() } catch (ignored: Exception) {}
                                 onDismiss?.run()
                             }
@@ -91,11 +91,10 @@ object PetalSearchEngineBridge {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PetalSearchEngineSheet(
-    onSelectEngine: (Int) -> Unit,
-    onDismiss: () -> Unit
+fun PetalSearchEngineSheetContent(
+    onConfirm: (Int) -> Unit,
+    onCancel: () -> Unit
 ) {
     val context = LocalContext.current
     val sp = remember { PreferenceManager.getDefaultSharedPreferences(context) }
@@ -104,24 +103,29 @@ fun PetalSearchEngineSheet(
         mutableIntStateOf(current.toIntOrNull() ?: 0)
     }
 
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
-        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-        dragHandle = {
-            BottomSheetDefaults.DragHandle(
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
-            )
-        }
+    Surface(
+        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        modifier = Modifier.fillMaxWidth()
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 8.dp)
+                .padding(24.dp)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Title Header
+            // Drag Handle Bar
+            Box(
+                modifier = Modifier
+                    .width(36.dp)
+                    .height(4.dp)
+                    .clip(RoundedCornerShape(50))
+                    .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f))
+                    .align(Alignment.CenterHorizontally)
+            )
+
+            // Header Title
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -163,25 +167,24 @@ fun PetalSearchEngineSheet(
                     val bgColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f) else MaterialTheme.colorScheme.surfaceContainer
 
                     Surface(
-                        shape = RoundedCornerShape(20.dp),
+                        shape = RoundedCornerShape(18.dp),
                         color = bgColor,
                         modifier = Modifier
                             .fillMaxWidth()
                             .border(
                                 width = if (isSelected) 2.dp else 1.dp,
                                 color = borderColor,
-                                shape = RoundedCornerShape(20.dp)
+                                shape = RoundedCornerShape(18.dp)
                             )
-                            .clip(RoundedCornerShape(20.dp))
+                            .clip(RoundedCornerShape(18.dp))
                             .clickable {
                                 selectedIndex = engine.index
-                                onSelectEngine(engine.index)
                             }
                     ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 14.dp),
+                                .padding(horizontal = 16.dp, vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
@@ -201,7 +204,6 @@ fun PetalSearchEngineSheet(
                                 selected = isSelected,
                                 onClick = {
                                     selectedIndex = engine.index
-                                    onSelectEngine(engine.index)
                                 }
                             )
                         }
@@ -209,7 +211,27 @@ fun PetalSearchEngineSheet(
                 }
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(8.dp))
+
+            // Confirm Button
+            Button(
+                onClick = { onConfirm(selectedIndex) },
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp)
+            ) {
+                Icon(Icons.Rounded.Check, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = "Confirm Search Engine",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                )
+            }
         }
     }
 }

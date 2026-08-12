@@ -207,19 +207,31 @@ public class HelperUnit {
                                 fos.close();
                                 String text = activity.getString(R.string.app_done) + ". " + activity.getString(R.string.menu_download) +"?";
                                 Snackbar snackbar = Snackbar.make(BrowserActivity.getView(), text, Snackbar.LENGTH_LONG);
-                                snackbar.setAction(activity.getString(R.string.app_ok), v -> activity.startActivity(Intent.createChooser(new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS), null)));
+                                snackbar.setAction(activity.getString(R.string.app_ok), v -> {
+                                    if (activity instanceof com.petal.browser.activity.BrowserActivity) {
+                                        ((com.petal.browser.activity.BrowserActivity) activity).showDownloads();
+                                    }
+                                });
                                 snackbar.show();
                             } else {
                                 DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+                                String userAgent = WebSettings.getDefaultUserAgent(activity);
+                                if (userAgent != null && !userAgent.isEmpty()) {
+                                    request.addRequestHeader("User-Agent", userAgent);
+                                }
                                 CookieManager cookieManager = CookieManager.getInstance();
                                 String cookie = cookieManager.getCookie(url);
-                                request.addRequestHeader("Cookie", cookie);
-                                request.addRequestHeader("Accept", "text/html, application/xhtml+xml, *" + "/" + "*");
-                                request.addRequestHeader("Accept-Language", "en-US,en;q=0.7,he;q=0.3");
+                                if (cookie != null) {
+                                    request.addRequestHeader("Cookie", cookie);
+                                }
+                                request.addRequestHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8");
+                                request.addRequestHeader("Accept-Language", Locale.getDefault().toLanguageTag());
                                 request.addRequestHeader("Referer", url);
+                                request.setAllowedOverMetered(true);
+                                request.setAllowedOverRoaming(true);
                                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                                 request.setTitle(finalFileName);
-                                request.setMimeType(finalFileName);
+                                request.allowScanningByMediaScanner();
                                 request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, finalFileName);
                                 DownloadManager manager = (DownloadManager) activity.getSystemService(Context.DOWNLOAD_SERVICE);
                                 assert manager != null;
