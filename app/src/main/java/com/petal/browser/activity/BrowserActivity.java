@@ -1047,9 +1047,12 @@ public class BrowserActivity extends AppCompatActivity implements BrowserControl
     }
 
     private void handleFinalSearch(String query) {
-        if (!query.isEmpty() && !query.equals(ninjaWebView.getUrl())) {
+        if (query != null && !query.trim().isEmpty()) {
             hideSearch();
-            ninjaWebView.loadUrl(query);
+            String targetUrl = com.petal.browser.unit.BrowserUnit.queryWrapper(this, query.trim());
+            if (ninjaWebView != null) {
+                ninjaWebView.loadUrl(targetUrl);
+            }
         } else {
             NinjaToast.show(this, R.string.toast_input_empty);
         }
