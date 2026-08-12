@@ -91,7 +91,7 @@ object PetalHistoryBridge {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun PetalHistoryScreen(
     onOpenUrl: (String) -> Unit,
